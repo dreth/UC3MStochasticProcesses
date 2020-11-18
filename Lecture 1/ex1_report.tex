@@ -179,17 +179,62 @@ functions}\label{b---use-the-simulated-trajectories-to-estimate-the-mean-and-the
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{covs =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{100}\NormalTok{)}
 \NormalTok{mean_X =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{100}\NormalTok{)}
 \NormalTok{mean_Y =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{100}\NormalTok{)}
 \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{100}\NormalTok{) \{}
 \NormalTok{    x =}\StringTok{ }\NormalTok{Traj_X }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(run }\OperatorTok{==}\StringTok{ }\NormalTok{i) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{select}\NormalTok{(val)}
 \NormalTok{    y =}\StringTok{ }\NormalTok{Traj_Y }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(run }\OperatorTok{==}\StringTok{ }\NormalTok{i) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{select}\NormalTok{(val)}
-\NormalTok{    covs[i] =}\StringTok{ }\KeywordTok{cov}\NormalTok{(x,y)}
-\NormalTok{    mean_X[i] =}\StringTok{ }\KeywordTok{mean}\NormalTok{(x)}
-\NormalTok{    mean_Y[i] =}\StringTok{ }\KeywordTok{mean}\NormalTok{(y)}
+\NormalTok{    mean_X[i] =}\StringTok{ }\KeywordTok{mean}\NormalTok{(x}\OperatorTok{$}\NormalTok{val)}
+\NormalTok{    mean_Y[i] =}\StringTok{ }\KeywordTok{mean}\NormalTok{(y}\OperatorTok{$}\NormalTok{val)}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
+
+The mean of all trajectories of X is the following:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{mean}\NormalTok{(mean_X)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -0.002558796
+\end{verbatim}
+
+The mean of all trajectories of Y is the following:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{mean}\NormalTok{(mean_Y)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -5.629677e+296
+\end{verbatim}
+
+The mean of the covariances of all combinations of trajectories is the
+following:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covs =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{100}\OperatorTok{*}\DecValTok{100}\NormalTok{)}
+\NormalTok{cnt =}\StringTok{ }\DecValTok{0}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{100}\NormalTok{) \{}
+    \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{100}\NormalTok{) \{}
+\NormalTok{        x =}\StringTok{ }\NormalTok{Traj_X }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(run }\OperatorTok{==}\StringTok{ }\NormalTok{i) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{select}\NormalTok{(val)}
+\NormalTok{        y =}\StringTok{ }\NormalTok{Traj_Y }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(run }\OperatorTok{==}\StringTok{ }\NormalTok{j) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{select}\NormalTok{(val)}
+\NormalTok{        cnt =}\StringTok{ }\NormalTok{cnt }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{        covs[cnt] =}\StringTok{ }\KeywordTok{cov}\NormalTok{(x,y)}
+\NormalTok{    \}}
+\NormalTok{\}}
+\KeywordTok{mean}\NormalTok{(covs)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -4.211591e+295
+\end{verbatim}
 
 \end{document}

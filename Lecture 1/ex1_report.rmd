@@ -57,16 +57,45 @@ The values of Y are too large for ggplot to show.
 ### b - Use the simulated trajectories to estimate the mean and the covariance functions
 
 ```{r, echo=TRUE, warning=FALSE}
-covs = rep(0,100)
 mean_X = rep(0,100)
 mean_Y = rep(0,100)
 for (i in 1:100) {
     x = Traj_X %>% filter(run == i) %>% select(val)
     y = Traj_Y %>% filter(run == i) %>% select(val)
-    covs[i] = cov(x,y)
-    mean_X[i] = mean(x)
-    mean_Y[i] = mean(y)
+    mean_X[i] = mean(x$val)
+    mean_Y[i] = mean(y$val)
 }
 ```
 
-The mean 
+The mean of all trajectories of X is the following:
+
+```{r, echo=TRUE, warning=FALSE}
+mean(mean_X)
+```
+
+The mean of all trajectories of Y is the following:
+
+```{r, echo=TRUE, warning=FALSE}
+mean(mean_Y)
+```
+
+The mean of the covariances of all combinations of trajectories is the following:
+
+```{r, echo=TRUE, warning=FALSE}
+covs = rep(0,100*100)
+cnt = 0
+for (i in 1:100) {
+    for (j in 1:100) {
+        x = Traj_X %>% filter(run == i) %>% select(val)
+        y = Traj_Y %>% filter(run == j) %>% select(val)
+        cnt = cnt + 1
+        covs[cnt] = cov(x,y)
+    }
+}
+mean(covs)
+```
+
+### c - Is the process stationary? Is it weakly stationary?
+
+### d - If the process is weakly stationary, use the function acf to display the autocorrelation function and compare with your own estimate
+
