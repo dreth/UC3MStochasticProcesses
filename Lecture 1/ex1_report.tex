@@ -165,8 +165,6 @@ trajectories}\label{a---plotting-simulated-trajectories}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{ex1_report_files/figure-latex/unnamed-chunk-3-1.pdf}
-
 \hypertarget{trajectories-y}{%
 \paragraph{Trajectories Y}\label{trajectories-y}}
 
@@ -199,7 +197,7 @@ The mean of all trajectories of X is the following:
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -0.006578448
+## [1] 0.0006711337
 \end{verbatim}
 
 The mean of all trajectories of Y is the following:
@@ -211,7 +209,7 @@ The mean of all trajectories of Y is the following:
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 5.338702e+296
+## [1] -7.010834e+295
 \end{verbatim}
 
 The mean of the covariances of all combinations of trajectories is the
@@ -233,10 +231,6 @@ following:
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## [1] 1.260156e+295
-\end{verbatim}
-
 \hypertarget{c---is-the-process-stationary-is-it-weakly-stationary}{%
 \subsubsection{c - Is the process stationary? Is it weakly
 stationary?}\label{c---is-the-process-stationary-is-it-weakly-stationary}}
@@ -245,5 +239,35 @@ stationary?}\label{c---is-the-process-stationary-is-it-weakly-stationary}}
 \subsubsection{d - If the process is weakly stationary, use the function
 acf to display the autocorrelation function and compare with your own
 estimate}\label{d---if-the-process-is-weakly-stationary-use-the-function-acf-to-display-the-autocorrelation-function-and-compare-with-your-own-estimate}}
+
+\hypertarget{exercise-4}{%
+\subsection{Exercise 4}\label{exercise-4}}
+
+Given the transition matrix:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\FloatTok{0.1}\NormalTok{, }\FloatTok{0.4}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\FloatTok{0.3}\NormalTok{,}
+       \FloatTok{0.6}\NormalTok{,   }\DecValTok{0}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\FloatTok{0.2}\NormalTok{,}
+       \FloatTok{0.1}\NormalTok{, }\FloatTok{0.3}\NormalTok{, }\FloatTok{0.3}\NormalTok{, }\FloatTok{0.3}\NormalTok{,}
+       \FloatTok{0.5}\NormalTok{, }\FloatTok{0.3}\NormalTok{, }\FloatTok{0.1}\NormalTok{, }\FloatTok{0.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{a---px_4-3-x_3-4}{%
+\subsubsection{\texorpdfstring{a -
+\(P(X_{4} = 3 | X_{3} = 4)\)}{a - P(X\_\{4\} = 3 \textbar{} X\_\{3\} = 4)}}\label{a---px_4-3-x_3-4}}
+
+\hypertarget{b---px_4-3-x_2-4}{%
+\subsubsection{\texorpdfstring{b -
+\(P(X_{4} = 3 | X_{2} = 4)\)}{b - P(X\_\{4\} = 3 \textbar{} X\_\{2\} = 4)}}\label{b---px_4-3-x_2-4}}
+
+\hypertarget{c---px_1-1}{%
+\subsubsection{\texorpdfstring{c -
+\(P(X_{1} = 1)\)}{c - P(X\_\{1\} = 1)}}\label{c---px_1-1}}
+
+\hypertarget{d---ex_2}{%
+\subsubsection{\texorpdfstring{d -
+\(E[X_{2}]\)}{d - E{[}X\_\{2\}{]}}}\label{d---ex_2}}
 
 \end{document}

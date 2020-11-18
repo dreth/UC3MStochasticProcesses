@@ -45,7 +45,7 @@ for (k in 1:100) {
 
 #### Trajectories X
 
-```{r, echo=TRUE, warning=FALSE}
+```{r, echo=TRUE, warning=FALSE, eval=FALSE}
 ggplot(data = Traj_X, aes(x=x, y=val)) + 
     geom_line(aes(colour=run), show.legend=FALSE)
 ```
@@ -81,7 +81,7 @@ mean(mean_Y)
 
 The mean of the covariances of all combinations of trajectories is the following:
 
-```{r, echo=TRUE, warning=FALSE}
+```{r, echo=TRUE, warning=FALSE, eval=FALSE}
 covs = rep(0,100*100)
 cnt = 0
 for (i in 1:100) {
@@ -99,3 +99,54 @@ mean(covs)
 
 ### d - If the process is weakly stationary, use the function acf to display the autocorrelation function and compare with your own estimate
 
+## Exercise 4
+
+Given the transition matrix and initial distribution:
+
+```{r, echo=TRUE, warning=FALSE}
+P <- c(0.1, 0.4, 0.2, 0.3,
+       0.6,   0, 0.2, 0.2,
+       0.1, 0.3, 0.3, 0.3,
+       0.5, 0.3, 0.1, 0.1)
+
+alpha=rep(1/4,4) #uniform initial distribution
+```
+
+We define the following function to calculate matrix powers (thanks profe!):
+
+```{r, echo=TRUE, warning=FALSE}
+matrixpower <- function(M,k) {
+  # ARGUMENTS:
+  # M: square matrix 
+  # k: exponent
+  if(dim(M)[1]!=dim(M)[2]) return(print("Error: matrix M is not square"))
+  if (k == 0) return(diag(dim(M)[1]))  # if k=0 returns the identity matrix
+  if (k == 1) return(M)
+  if (k > 1)  return(M %*% matrixpower(M, k-1)) # if k>1 recursively apply the function
+}
+```
+
+
+### a - $P(X_{4} = 3 | X_{3} = 4)$
+
+```{r, echo=TRUE, warning=FALSE}
+P[4,3]
+```
+
+### b - $P(X_{4} = 3 | X_{2} = 4)$
+
+```{r, echo=TRUE, warning=FALSE}
+matrixpower(P,2)[4,3]
+```
+
+### c - $P(X_{1} = 1)$
+
+```{r, echo=TRUE, warning=FALSE}
+(t(alpha)%*%P)[1]
+```
+
+### d - $E[X_{2}]$
+
+```{r, echo=TRUE, warning=FALSE}
+
+```
