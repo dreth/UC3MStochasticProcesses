@@ -1,0 +1,30 @@
+---
+title: 'Week 1 exercises'
+author: "Daniel Alonso"
+date: "November 18th, 2020"
+output: 'pdf_document'
+---
+
+## Exercise 1
+
+Simulating 100 trajectories of length $n = 1000$ for $X$ and $Y$.
+
+```{r, echo=TRUE, warning=FALSE, eval=FALSE}
+Traj_X = c()
+Traj_Y = c()
+X = c(0)
+Y = c(0)
+for (k in 1:100) {
+    for (i in 1:1000) {
+        if (i > 1) {
+            X = c(X, 0.5*X[i-1]+rnorm(1))
+            Y = c(Y, 2*Y[i-1]+rnorm(1))
+        }
+    }
+    Traj_X = c(Traj_X, X)
+    Traj_Y = c(Traj_Y, Y)
+}
+```
+
+### Plotting simulated trajectories
+
