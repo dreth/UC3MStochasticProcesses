@@ -111,6 +111,16 @@
 \begin{document}
 \maketitle
 
+Importing libraries
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{library}\NormalTok{(foreach)}
+\KeywordTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
 \hypertarget{exercise-1}{%
 \subsection{Exercise 1}\label{exercise-1}}
 
@@ -118,19 +128,66 @@ Simulating 100 trajectories of length \(n = 1000\) for \(X\) and \(Y\).
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Traj_X =}\StringTok{ }\KeywordTok{c}\NormalTok{()}
-\NormalTok{Traj_Y =}\StringTok{ }\KeywordTok{c}\NormalTok{()}
-\NormalTok{X =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{)}
-\NormalTok{Y =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{)}
+\NormalTok{Traj_X <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{()}
+\NormalTok{Traj_Y <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{()}
 \ControlFlowTok{for}\NormalTok{ (k }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{100}\NormalTok{) \{}
+\NormalTok{    X <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x=}\DecValTok{1}\OperatorTok{:}\DecValTok{1000}\NormalTok{,}\DataTypeTok{val=}\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1000}\NormalTok{),}\DataTypeTok{run=}\KeywordTok{rep}\NormalTok{(k,}\DecValTok{1000}\NormalTok{))}
+\NormalTok{    Y <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x=}\DecValTok{1}\OperatorTok{:}\DecValTok{1000}\NormalTok{,}\DataTypeTok{val=}\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1000}\NormalTok{),}\DataTypeTok{run=}\KeywordTok{rep}\NormalTok{(k,}\DecValTok{1000}\NormalTok{))}
+\NormalTok{    X_r <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
+\NormalTok{    Y_r <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1000}\NormalTok{)}
     \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{1000}\NormalTok{) \{}
         \ControlFlowTok{if}\NormalTok{ (i }\OperatorTok{>}\StringTok{ }\DecValTok{1}\NormalTok{) \{}
-\NormalTok{            X =}\StringTok{ }\KeywordTok{c}\NormalTok{(X, }\FloatTok{0.5}\OperatorTok{*}\NormalTok{X[i}\DecValTok{-1}\NormalTok{]}\OperatorTok{+}\KeywordTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{))}
-\NormalTok{            Y =}\StringTok{ }\KeywordTok{c}\NormalTok{(Y, }\DecValTok{2}\OperatorTok{*}\NormalTok{Y[i}\DecValTok{-1}\NormalTok{]}\OperatorTok{+}\KeywordTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{))}
+\NormalTok{            X_r[i] <-}\StringTok{ }\FloatTok{0.5}\OperatorTok{*}\NormalTok{X_r[i}\DecValTok{-1}\NormalTok{]}\OperatorTok{+}\KeywordTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{            Y_r[i] <-}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{Y_r[i}\DecValTok{-1}\NormalTok{]}\OperatorTok{+}\KeywordTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{)}
 \NormalTok{        \}}
 \NormalTok{    \}}
-\NormalTok{    Traj_X =}\StringTok{ }\KeywordTok{c}\NormalTok{(Traj_X, X)}
-\NormalTok{    Traj_Y =}\StringTok{ }\KeywordTok{c}\NormalTok{(Traj_Y, Y)}
+\NormalTok{    X}\OperatorTok{$}\NormalTok{val <-}\StringTok{ }\NormalTok{X_r}
+\NormalTok{    Y}\OperatorTok{$}\NormalTok{val <-}\StringTok{ }\NormalTok{Y_r}
+\NormalTok{    Traj_X <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(Traj_X, X)}
+\NormalTok{    Traj_Y <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(Traj_Y, Y)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\newpage
+
+\hypertarget{a---plotting-simulated-trajectories}{%
+\subsubsection{a - Plotting simulated
+trajectories}\label{a---plotting-simulated-trajectories}}
+
+\hypertarget{trajectories-x}{%
+\paragraph{Trajectories X}\label{trajectories-x}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ Traj_X, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{x, }\DataTypeTok{y=}\NormalTok{val)) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom_line}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{colour=}\NormalTok{run), }\DataTypeTok{show.legend=}\OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ex1_report_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\hypertarget{trajectories-y}{%
+\paragraph{Trajectories Y}\label{trajectories-y}}
+
+The values of Y are too large for ggplot to show.
+
+\hypertarget{b---use-the-simulated-trajectories-to-estimate-the-mean-and-the-covariance-functions}{%
+\subsubsection{b - Use the simulated trajectories to estimate the mean
+and the covariance
+functions}\label{b---use-the-simulated-trajectories-to-estimate-the-mean-and-the-covariance-functions}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covs =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{100}\NormalTok{)}
+\NormalTok{mean_X =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{100}\NormalTok{)}
+\NormalTok{mean_Y =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{100}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{100}\NormalTok{) \{}
+\NormalTok{    x =}\StringTok{ }\NormalTok{Traj_X }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(run }\OperatorTok{==}\StringTok{ }\NormalTok{i) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{select}\NormalTok{(val)}
+\NormalTok{    y =}\StringTok{ }\NormalTok{Traj_Y }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(run }\OperatorTok{==}\StringTok{ }\NormalTok{i) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{select}\NormalTok{(val)}
+\NormalTok{    covs[i] =}\StringTok{ }\KeywordTok{cov}\NormalTok{(x,y)}
+\NormalTok{    mean_X[i] =}\StringTok{ }\KeywordTok{mean}\NormalTok{(x)}
+\NormalTok{    mean_Y[i] =}\StringTok{ }\KeywordTok{mean}\NormalTok{(y)}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}

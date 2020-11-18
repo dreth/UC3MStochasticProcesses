@@ -5,26 +5,68 @@ date: "November 18th, 2020"
 output: 'pdf_document'
 ---
 
+Importing libraries
+
+```{r, echo=TRUE, warning=FALSE}
+library(ggplot2)
+library(foreach)
+library(dplyr)
+```
+
+
 ## Exercise 1
 
 Simulating 100 trajectories of length $n = 1000$ for $X$ and $Y$.
 
-```{r, echo=TRUE, warning=FALSE, eval=FALSE}
-Traj_X = c()
-Traj_Y = c()
-X = c(0)
-Y = c(0)
+```{r, echo=TRUE, warning=FALSE}
+Traj_X <- data.frame()
+Traj_Y <- data.frame()
 for (k in 1:100) {
+    X <- data.frame(x=1:1000,val=rep(0,1000),run=rep(k,1000))
+    Y <- data.frame(x=1:1000,val=rep(0,1000),run=rep(k,1000))
+    X_r <- rep(0,1000)
+    Y_r <- rep(0,1000)
     for (i in 1:1000) {
         if (i > 1) {
-            X = c(X, 0.5*X[i-1]+rnorm(1))
-            Y = c(Y, 2*Y[i-1]+rnorm(1))
+            X_r[i] <- 0.5*X_r[i-1]+rnorm(1)
+            Y_r[i] <- 2*Y_r[i-1]+rnorm(1)
         }
     }
-    Traj_X = c(Traj_X, X)
-    Traj_Y = c(Traj_Y, Y)
+    X$val <- X_r
+    Y$val <- Y_r
+    Traj_X <- rbind(Traj_X, X)
+    Traj_Y <- rbind(Traj_Y, Y)
 }
 ```
 
-### Plotting simulated trajectories
+\newpage
 
+### a - Plotting simulated trajectories
+
+#### Trajectories X
+
+```{r, echo=TRUE, warning=FALSE}
+ggplot(data = Traj_X, aes(x=x, y=val)) + 
+    geom_line(aes(colour=run), show.legend=FALSE)
+```
+
+#### Trajectories Y
+
+The values of Y are too large for ggplot to show. 
+
+### b - Use the simulated trajectories to estimate the mean and the covariance functions
+
+```{r, echo=TRUE, warning=FALSE}
+covs = rep(0,100)
+mean_X = rep(0,100)
+mean_Y = rep(0,100)
+for (i in 1:100) {
+    x = Traj_X %>% filter(run == i) %>% select(val)
+    y = Traj_Y %>% filter(run == i) %>% select(val)
+    covs[i] = cov(x,y)
+    mean_X[i] = mean(x)
+    mean_Y[i] = mean(y)
+}
+```
+
+The mean 
