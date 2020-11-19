@@ -1,0 +1,254 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={Week 2 exercises},
+            pdfauthor={Daniel Alonso},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Week 2 exercises}
+\author{Daniel Alonso}
+\date{November 19th, 2020}
+
+\begin{document}
+\maketitle
+
+Importing libraries
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{library}\NormalTok{(matlib)}
+\end{Highlighting}
+\end{Shaded}
+
+We define the following function to calculate matrix powers (thanks
+profe!):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{matrixpower <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(M,k) \{}
+  \CommentTok{# ARGUMENTS:}
+  \CommentTok{# M: square matrix }
+  \CommentTok{# k: exponent}
+  \ControlFlowTok{if}\NormalTok{(}\KeywordTok{dim}\NormalTok{(M)[}\DecValTok{1}\NormalTok{]}\OperatorTok{!=}\KeywordTok{dim}\NormalTok{(M)[}\DecValTok{2}\NormalTok{]) }\KeywordTok{return}\NormalTok{(}\KeywordTok{print}\NormalTok{(}\StringTok{"Error: matrix M is not square"}\NormalTok{))}
+  \ControlFlowTok{if}\NormalTok{ (k }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{) }\KeywordTok{return}\NormalTok{(}\KeywordTok{diag}\NormalTok{(}\KeywordTok{dim}\NormalTok{(M)[}\DecValTok{1}\NormalTok{]))  }\CommentTok{# if k=0 returns the identity matrix}
+  \ControlFlowTok{if}\NormalTok{ (k }\OperatorTok{==}\StringTok{ }\DecValTok{1}\NormalTok{) }\KeywordTok{return}\NormalTok{(M)}
+  \ControlFlowTok{if}\NormalTok{ (k }\OperatorTok{>}\StringTok{ }\DecValTok{1}\NormalTok{)  }\KeywordTok{return}\NormalTok{(M }\OperatorTok{%*%}\StringTok{ }\KeywordTok{matrixpower}\NormalTok{(M, k}\DecValTok{-1}\NormalTok{)) }\CommentTok{# if k>1 recursively apply the function}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{exercise-1}{%
+\subsection{Exercise 1}\label{exercise-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\FloatTok{0.1}\NormalTok{, }\FloatTok{0.4}\NormalTok{, }\FloatTok{0.5}\NormalTok{,}
+       \FloatTok{0.4}\NormalTok{, }\FloatTok{0.6}\NormalTok{,   }\DecValTok{0}\NormalTok{,}
+       \FloatTok{0.6}\NormalTok{,   }\DecValTok{0}\NormalTok{, }\FloatTok{0.4}\NormalTok{)}
+\NormalTok{P <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(P,}\DataTypeTok{nrow=}\DecValTok{3}\NormalTok{,}\DataTypeTok{byrow=}\NormalTok{T)}
+\end{Highlighting}
+\end{Shaded}
+
+First we solve \(\pi P = \pi\):
+
+\(\pi (P-I) = (1,0, \dots, 0)\)
+
+\((\pi_{1}, \pi_{2}, \pi_{3}) \begin{pmatrix} 1 & 0.4 & 0.5 \\ 1 & -0.4 & 0 \\ 1 & 0 & -0.6 \end{pmatrix} = (1,0,0)\)
+
+Solving the system we get:
+
+\(\pi = (\frac{6}{17}, \frac{15}{17}, \frac{10}{17})\)
+
+Which is our stationary distribution.
+
+\newpage
+
+\hypertarget{exercise-2}{%
+\subsection{Exercise 2}\label{exercise-2}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{stationary_dist <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(P) \{}
+\NormalTok{    dim =}\StringTok{ }\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{length}\NormalTok{(P))}
+\NormalTok{    mat =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(P,}\DataTypeTok{nrow=}\NormalTok{dim, }\DataTypeTok{byrow=}\NormalTok{T)}
+\NormalTok{    A =}\StringTok{ }\NormalTok{mat }\OperatorTok{-}\StringTok{ }\KeywordTok{diag}\NormalTok{(dim)}
+\NormalTok{    b =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,dim}\DecValTok{-1}\NormalTok{))}
+\NormalTok{    A[,}\DecValTok{1}\NormalTok{] <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,dim)}
+    \KeywordTok{print}\NormalTok{(}\StringTok{"The system is the following:"}\NormalTok{)}
+    \KeywordTok{showEqn}\NormalTok{(A, b)}
+
+    \KeywordTok{print}\NormalTok{(}\StringTok{"The solution is the following:"}\NormalTok{)}
+\NormalTok{    pi <-}\StringTok{ }\NormalTok{matlib}\OperatorTok{::}\KeywordTok{Solve}\NormalTok{(A, b, }\DataTypeTok{fractions =} \OtherTok{TRUE}\NormalTok{)}
+    \KeywordTok{return}\NormalTok{(pi)}
+\NormalTok{\}}
+
+\NormalTok{P <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\FloatTok{0.1}\NormalTok{, }\FloatTok{0.4}\NormalTok{, }\FloatTok{0.5}\NormalTok{,}
+       \FloatTok{0.4}\NormalTok{, }\FloatTok{0.6}\NormalTok{,   }\DecValTok{0}\NormalTok{,}
+       \FloatTok{0.6}\NormalTok{,   }\DecValTok{0}\NormalTok{, }\FloatTok{0.4}\NormalTok{)}
+
+\KeywordTok{stationary_dist}\NormalTok{(P)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "The system is the following:"
+## 1*x1 + 0.4*x2 + 0.5*x3  =  1 
+## 1*x1 - 0.4*x2   + 0*x3  =  0 
+## 1*x1   + 0*x2 - 0.6*x3  =  0 
+## [1] "The solution is the following:"
+## x1      =   6/17 
+##   x2    =  15/17 
+##     x3  =  10/17
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "x1      =   6/17" "  x2    =  15/17" "    x3  =  10/17"
+\end{verbatim}
+
+\hypertarget{exercise-3}{%
+\subsection{Exercise 3}\label{exercise-3}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P <-}\StringTok{ }\KeywordTok{c}\NormalTok{(  }\DecValTok{0}\NormalTok{, }\DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{,   }\DecValTok{0}\NormalTok{, }\DecValTok{2}\OperatorTok{/}\DecValTok{3}\NormalTok{,}
+       \DecValTok{2}\OperatorTok{/}\DecValTok{3}\NormalTok{,   }\DecValTok{0}\NormalTok{,   }\DecValTok{0}\NormalTok{, }\DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{,}
+         \DecValTok{0}\NormalTok{,   }\DecValTok{0}\NormalTok{,   }\DecValTok{1}\NormalTok{,   }\DecValTok{0}\NormalTok{,}
+       \DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{, }\DecValTok{2}\OperatorTok{/}\DecValTok{3}\NormalTok{,   }\DecValTok{0}\NormalTok{,   }\DecValTok{0}\NormalTok{)}
+\NormalTok{P <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(P,}\DataTypeTok{nrow=}\DecValTok{4}\NormalTok{,}\DataTypeTok{byrow=}\NormalTok{T)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{a---find-the-communication-classes-and-classify-the-states.}{%
+\subsubsection{a - Find the communication classes and classify the
+states.}\label{a---find-the-communication-classes-and-classify-the-states.}}
+
+We have two communication classes
+
+\hypertarget{b---find-the-set-of-stationary-distributions.}{%
+\subsubsection{b - Find the set of stationary
+distributions.}\label{b---find-the-set-of-stationary-distributions.}}
+
+Gotta do some fancy stuff here
+
+\newpage
+
+\hypertarget{c---how-is-the-long-run-behavior-of-the-chain-analyze-lim_ntoinfty-pn-with-r}{%
+\subsubsection{\texorpdfstring{c - How is the long-run behavior of the
+chain? Analyze \(\lim_{n\to\infty} P^{n}\) with
+R}{c - How is the long-run behavior of the chain? Analyze \textbackslash{}lim\_\{n\textbackslash{}to\textbackslash{}infty\} P\^{}\{n\} with R}}\label{c---how-is-the-long-run-behavior-of-the-chain-analyze-lim_ntoinfty-pn-with-r}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{matrixpower}\NormalTok{(P,}\DecValTok{50}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           [,1]      [,2] [,3]      [,4]
+## [1,] 0.3333333 0.3333333    0 0.3333333
+## [2,] 0.3333333 0.3333333    0 0.3333333
+## [3,] 0.0000000 0.0000000    1 0.0000000
+## [4,] 0.3333333 0.3333333    0 0.3333333
+\end{verbatim}
+
+\end{document}

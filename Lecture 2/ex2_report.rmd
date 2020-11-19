@@ -1,0 +1,104 @@
+---
+title: 'Week 2 exercises'
+author: "Daniel Alonso"
+date: "November 19th, 2020"
+output: 'pdf_document'
+---
+
+Importing libraries
+
+```{r, echo=TRUE, warning=FALSE}
+library(ggplot2)
+library(matlib)
+```
+
+We define the following function to calculate matrix powers (thanks profe!):
+
+```{r, echo=TRUE, warning=FALSE}
+matrixpower <- function(M,k) {
+  # ARGUMENTS:
+  # M: square matrix 
+  # k: exponent
+  if(dim(M)[1]!=dim(M)[2]) return(print("Error: matrix M is not square"))
+  if (k == 0) return(diag(dim(M)[1]))  # if k=0 returns the identity matrix
+  if (k == 1) return(M)
+  if (k > 1)  return(M %*% matrixpower(M, k-1)) # if k>1 recursively apply the function
+}
+```
+
+
+## Exercise 1
+
+```{r, echo=TRUE, warning=FALSE}
+P <- c(0.1, 0.4, 0.5,
+       0.4, 0.6,   0,
+       0.6,   0, 0.4)
+P <- matrix(P,nrow=3,byrow=T)
+```
+
+First we solve $\pi P = \pi$:
+
+$\pi (P-I) = (1,0, \dots, 0)$
+
+$(\pi_{1}, \pi_{2}, \pi_{3}) \begin{pmatrix} 1 & 0.4 & 0.5 \\ 1 & -0.4 & 0 \\ 1 & 0 & -0.6 \end{pmatrix} = (1,0,0)$
+
+Solving the system we get:
+
+$\pi = (\frac{6}{17}, \frac{15}{17}, \frac{10}{17})$
+
+Which is our stationary distribution.
+
+\newpage
+
+## Exercise 2
+
+```{r, echo=TRUE, warning=FALSE}
+stationary_dist <- function(P) {
+    dim = sqrt(length(P))
+    mat = matrix(P,nrow=dim, byrow=T)
+    A = mat - diag(dim)
+    b = c(1,rep(0,dim-1))
+    A[,1] <- rep(1,dim)
+    print("The system is the following:")
+    showEqn(A, b)
+
+    print("The solution is the following:")
+    pi <- matlib::Solve(A, b, fractions = TRUE)
+    return(pi)
+}
+
+P <- c(0.1, 0.4, 0.5,
+       0.4, 0.6,   0,
+       0.6,   0, 0.4)
+
+stationary_dist(P)
+```
+
+## Exercise 3
+
+```{r, echo=TRUE, warning=FALSE}
+P <- c(  0, 1/3,   0, 2/3,
+       2/3,   0,   0, 1/3,
+         0,   0,   1,   0,
+       1/3, 2/3,   0,   0)
+P <- matrix(P,nrow=4,byrow=T)
+```
+
+### a - Find the communication classes and classify the states.
+
+We have two communication classes
+
+### b - Find the set of stationary distributions.
+
+Gotta do some fancy stuff here
+
+```{r, echo=TRUE, warning=FALSE}
+```
+
+\newpage
+
+### c - How is the long-run behavior of the chain? Analyze $\lim_{n\to\infty} P^{n}$ with R
+
+```{r, echo=TRUE, warning=FALSE}
+matrixpower(P,50)
+```

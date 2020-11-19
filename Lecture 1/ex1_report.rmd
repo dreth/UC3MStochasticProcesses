@@ -22,7 +22,7 @@ Simulating 100 trajectories of length $n = 1000$ for $X$ and $Y$.
 Traj_X <- data.frame()
 Traj_Y <- data.frame()
 for (k in 1:100) {
-    X <- data.frame(x=1:1000,val=rep(0,1000),run=rep(k,1000))
+    X <- data.frame(x=1:1000,val=rep(0,1000),run=rep(k,1000)) 
     Y <- data.frame(x=1:1000,val=rep(0,1000),run=rep(k,1000))
     X_r <- rep(0,1000)
     Y_r <- rep(0,1000)
@@ -97,7 +97,54 @@ mean(covs)
 
 ### c - Is the process stationary? Is it weakly stationary?
 
+X is stationary but Y is not
+
 ### d - If the process is weakly stationary, use the function acf to display the autocorrelation function and compare with your own estimate
+
+```{r, echo=TRUE, warning=FALSE, eval=FALSE}
+acf(X[1,])
+L=30
+acfx=numeric(length=L)
+for (i in 1:L){
+  acfx[i]=mean(diag(gX[1:(n+1-i),(i+1):(n+1)]))
+}
+plot(1:L, acfx)
+```
+
+## Exercise 2
+
+$I_{0} = 5$ and $S_{0} = 1000$
+
+$\alpha = 0.0005$
+
+```{r, echo=TRUE, warning=FALSE}
+alpha <- 0.004
+cases <- c(5)
+s <- 1000
+i <- 5
+while (i > 0) {
+    p <- 1 - (1 - 0.0005)^(i)
+    i <- rbinom(1, s, p)
+    cases <- c(cases, i)
+}
+```
+
+```{r, echo=TRUE, warning=FALSE}
+plot(cases)
+```
+
+```{r, echo=TRUE, warning=FALSE}
+P <- c(0.1, 0.4, 0.2, 0.3,
+       0.6,   0, 0.2, 0.2,
+       0.1, 0.3, 0.3, 0.3,
+       0.5, 0.3, 0.1, 0.1)
+P <- matrix(P,nrow=4,byrow=T)
+alpha=rep(1/4,4) #uniform initial distribution
+```
+
+
+
+
 
 ## Exercise 4
 
@@ -108,7 +155,7 @@ P <- c(0.1, 0.4, 0.2, 0.3,
        0.6,   0, 0.2, 0.2,
        0.1, 0.3, 0.3, 0.3,
        0.5, 0.3, 0.1, 0.1)
-
+P <- matrix(P,nrow=4,byrow=T)
 alpha=rep(1/4,4) #uniform initial distribution
 ```
 
