@@ -7,6 +7,8 @@ output: 'pdf_document'
 
 # Problem 1
 
+## a)
+
 Markov chain criteria:
 
 1- The probability of being in a state only depends on the previous state.
@@ -16,4 +18,15 @@ Markov chain criteria:
 $X$ = The chain hits state $j$ at time $n$
 
 $X_{n}$ is the scenario at time $n$
+
+All states have finite expected return times and are communicated with each other, also the MC is irreducible, therefore its stationary distribution is **unique**.
+
+## b)
+
+# Problem 2
+
+## a)
+
+$\sum
+
 
