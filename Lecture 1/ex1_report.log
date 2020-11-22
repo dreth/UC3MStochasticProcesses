@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2020.10.26)  19 NOV 2020 22:31
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2020.10.26)  19 NOV 2020 22:38
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -531,13 +531,13 @@ LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 Here is how much of TeX's memory you used:
  12766 strings out of 483183
  189553 string characters out of 5966291
- 467571 words of memory out of 5000000
+ 467569 words of memory out of 5000000
  27500 multiletter control sequences out of 15000+600000
  573432 words of font info for 73 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  34i,6n,42p,944b,366s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}</usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fonts/type1/public/lm/lmr7.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtti10.pfb>
-Output written on "/home/dreth/.local/share/Cryptomator/mnt/qO7BgnSQeH87_0/UC3M/COURSES/stochastic processes/UC3MStochasticProcesses/Lecture 1/ex1_report.pdf" (4 pages, 232223 bytes).
+Output written on "/home/dreth/.local/share/Cryptomator/mnt/qO7BgnSQeH87_0/UC3M/COURSES/stochastic processes/UC3MStochasticProcesses/Lecture 1/ex1_report.pdf" (4 pages, 232558 bytes).
 PDF statistics:
  107 PDF objects out of 1000 (max. 8388607)
  89 compressed objects within 1 object stream

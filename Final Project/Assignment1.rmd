@@ -1,0 +1,19 @@
+---
+title: 'Assignment 1'
+author: "Group 1"
+date: "November 22th, 2020"
+output: 'pdf_document'
+---
+
+# Problem 1
+
+Markov chain criteria:
+
+1- The probability of being in a state only depends on the previous state.
+
+2- It's a stochastic process.
+
+$X$ = The chain hits state $j$ at time $n$
+
+$X_{n}$ is the scenario at time $n$
+

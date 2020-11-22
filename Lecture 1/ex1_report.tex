@@ -197,7 +197,7 @@ The mean of all trajectories of X is the following:
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -0.001032449
+## [1] 0.006358091
 \end{verbatim}
 
 The mean of all trajectories of Y is the following:
@@ -209,7 +209,7 @@ The mean of all trajectories of Y is the following:
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -3.036053e+296
+## [1] 7.706139e+296
 \end{verbatim}
 
 The mean of the covariances of all combinations of trajectories is the
@@ -268,7 +268,7 @@ estimate}\label{d---if-the-process-is-weakly-stationary-use-the-function-acf-to-
 \NormalTok{s <-}\StringTok{ }\DecValTok{1000}
 \NormalTok{i <-}\StringTok{ }\DecValTok{5}
 \ControlFlowTok{while}\NormalTok{ (i }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
-\NormalTok{    p <-}\StringTok{ }\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{(}\DecValTok{1} \OperatorTok{-}\StringTok{ }\FloatTok{0.0005}\NormalTok{)}\OperatorTok{^}\NormalTok{(i)}
+\NormalTok{    p <-}\StringTok{ }\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{(}\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{alpha)}\OperatorTok{^}\NormalTok{(i)}
 \NormalTok{    i <-}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(}\DecValTok{1}\NormalTok{, s, p)}
 \NormalTok{    cases <-}\StringTok{ }\KeywordTok{c}\NormalTok{(cases, i)}
 \NormalTok{\}}
