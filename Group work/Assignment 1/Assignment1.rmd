@@ -23,10 +23,15 @@ All states have finite expected return times and are communicated with each othe
 
 ## b)
 
+![Graph for prob.1](./grafo1.png)
+
+\newpage
+
 # Problem 2
 
 ## a)
 
-$\sum
+Because our MC is an irreducible infinite state MC, we have a unique stationary distribution $\pi$, $\pi_{i} = \frac{1}{\mu_{i}}$ and all states have expected finite return times then we have:
 
+$E[T_{i}|X_{0} = i] = \mu_{i} = \frac{1}{\pi_{i}}$
 
