@@ -109,10 +109,37 @@ distribution is \textbf{unique}.
 \hypertarget{a-1}{%
 \subsection{a)}\label{a-1}}
 
+We set up the following system of equations:
+
+\(\sum_{i=0} P_{i,0} \pi_{i} = \pi_{1}\)
+
+\(\sum_{i=1} \pi_{i} = 1\)
+
+\((1 - p) \pi_{1} = \pi_{2}\) \(\dots\)
+\((1 - p) \pi_{n-2} = \pi_{n-1}\) \(\dots\)
+
+For the first equation, each \(P_{i,0} = p\), therefore:
+
+\(\sum_{i=0} P_{i,0} \pi_{i} = \pi_{1} \Rightarrow p \sum_{i=1} \pi_{i} = \pi_{1}\)
+
+\(p = \pi_{1}\)
+
+\((1 - p)p = \pi_{2}\) \((1 - p)^{2} p = \pi_{3}\) \(\dots\)
+\((1 - p)^{n-1} p = \pi_{n}\) \(\dots\)
+
+Then, we get:
+
 Because our MC is an irreducible infinite state MC, we have a unique
 stationary distribution \(\pi\), \(\pi_{i} = \frac{1}{\mu_{i}}\) and all
 states have expected finite return times then we have:
 
 \(E[T_{i}|X_{0} = i] = \mu_{i} = \frac{1}{\pi_{i}}\)
+
+\hypertarget{b-1}{%
+\subsection{b)}\label{b-1}}
+
+Because it has a unique stationary distribution, it can only have one
+communication class (it is irreducible), all states are recurring states
+and there is no transient state.
 
 \end{document}

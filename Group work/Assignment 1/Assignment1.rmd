@@ -31,7 +31,81 @@ All states have finite expected return times and are communicated with each othe
 
 ## a)
 
+We set up the following system of equations:
+
+$\sum_{i=0} P_{i,0} \pi_{i} = \pi_{1}$
+
+$\sum_{i=1} \pi_{i} = 1$
+
+$(1 - p) \pi_{1} = \pi_{2}$
+$\dots$
+$(1 - p) \pi_{n-2} = \pi_{n-1}$
+$\dots$
+
+For the first equation, each $P_{i,0} = p$, therefore:
+
+$\sum_{i=0} P_{i,0} \pi_{i} = \pi_{1} \Rightarrow p \sum_{i=1} \pi_{i} = \pi_{1}$
+
+$p = \pi_{1}$
+
+$(1 - p)p = \pi_{2}$
+$(1 - p)^{2} p = \pi_{3}$
+$\dots$
+$(1 - p)^{n-1} p = \pi_{n}$
+$\dots$
+
+Then, we get:
+
+
+
+
 Because our MC is an irreducible infinite state MC, we have a unique stationary distribution $\pi$, $\pi_{i} = \frac{1}{\mu_{i}}$ and all states have expected finite return times then we have:
 
 $E[T_{i}|X_{0} = i] = \mu_{i} = \frac{1}{\pi_{i}}$
 
+## b)
+
+Because it has a unique stationary distribution, it can only have one communication class (it is irreducible), all states are recurring states and there is no transient state.
+
+
+
+
+
+
+4 cycle {2,4}
+
+5 cycle {}
+
+{1,2}
+
+## c)
+
+```{r, echo=TRUE, warning=FALSE}
+matrixpower <- function(M,k) {
+  # ARGUMENTS:
+  # M: square matrix 
+  # k: exponent
+  if(dim(M)[1]!=dim(M)[2]) return(print("Error: matrix M is not square"))
+  if (k == 0) return(diag(dim(M)[1]))  # if k=0 returns the identity matrix
+  if (k == 1) return(M)
+  if (k > 1)  return(M %*% matrixpower(M, k-1)) # if k>1 recursively apply the function
+}
+```
+
+```{r, echo=TRUE, warning=FALSE}
+mc <- function(p, sequences ,steps) {
+    n <- 100
+    MarkovChain <- matrix(rep(0,sequences^2), nrow=sequences, byrow=TRUE)
+    MarkovChain[,1] <- p
+    for (i in 1:sequences) {
+        if (i == sequences) {
+            MarkovChain[i,i] <- 0
+        } else {
+            MarkovChain[i,i+1] <- 1-p
+        }
+    }
+    return(MarkovChain)
+}
+
+
+```
