@@ -213,7 +213,7 @@ Which is our stationary distribution.
 \NormalTok{P <-}\StringTok{ }\KeywordTok{c}\NormalTok{(  }\DecValTok{0}\NormalTok{, }\DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{,   }\DecValTok{0}\NormalTok{, }\DecValTok{2}\OperatorTok{/}\DecValTok{3}\NormalTok{,}
        \DecValTok{2}\OperatorTok{/}\DecValTok{3}\NormalTok{,   }\DecValTok{0}\NormalTok{,   }\DecValTok{0}\NormalTok{, }\DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{,}
          \DecValTok{0}\NormalTok{,   }\DecValTok{0}\NormalTok{,   }\DecValTok{1}\NormalTok{,   }\DecValTok{0}\NormalTok{,}
-       \DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{, }\DecValTok{2}\OperatorTok{/}\DecValTok{3}\NormalTok{,   }\DecValTok{0}\NormalTok{,   }\DecValTok{0}\NormalTok{)}
+       \DecValTok{1}\OperatorTok{/}\DecValTok{3}\NormalTok{, }\DecValTok{2}\OperatorTok{/}\DecValTok{3}\NormalTok{,   }\DecValTok{0}\NormalTok{,   }\DecValTok{0}\NormalTok{ )}
 \NormalTok{P <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(P,}\DataTypeTok{nrow=}\DecValTok{4}\NormalTok{,}\DataTypeTok{byrow=}\NormalTok{T)}
 \end{Highlighting}
 \end{Shaded}
@@ -228,9 +228,18 @@ We have two communication classes
 \subsubsection{b - Find the set of stationary
 distributions.}\label{b---find-the-set-of-stationary-distributions.}}
 
-Gotta do some fancy stuff here
+First we solve \(\pi P = \pi\):
 
-\newpage
+\(\pi (P-I) = (1,0, \dots, 0)\)
+
+\(\begin{pmatrix} \pi_{1} & \pi_{2} & \pi_{3} & \pi_{4} \end{pmatrix} \begin{pmatrix} 1 & \frac{1}{3} & 0 & \frac{2}{3} \\ 1 & -1 & 0 & \frac{1}{3} \\ 1 & 0 & 0 & 0 \\ 1 & \frac{2}{3} & 0 & -1 \end{pmatrix} = (1,0,0,0)\)
+
+Solving the system we get:
+
+\(\pi = (0, 0, \pi_{3}, 0)\)
+
+Which is our stationary distribution, where \(\pi_{3}\) is a free
+variable.
 
 \hypertarget{c---how-is-the-long-run-behavior-of-the-chain-analyze-lim_ntoinfty-pn-with-r}{%
 \subsubsection{\texorpdfstring{c - How is the long-run behavior of the
@@ -250,5 +259,12 @@ R}{c - How is the long-run behavior of the chain? Analyze \textbackslash{}lim\_\
 ## [3,] 0.0000000 0.0000000    1 0.0000000
 ## [4,] 0.3333333 0.3333333    0 0.3333333
 \end{verbatim}
+
+\hypertarget{d---does-this-chain-have-a-limiting-distribution}{%
+\subsubsection{d - Does this chain have a limiting
+distribution?}\label{d---does-this-chain-have-a-limiting-distribution}}
+
+No, this chain does not have a limiting distribution because
+\(\lim_{n\to\infty} \alpha P^{n} \neq \lambda\)
 
 \end{document}
