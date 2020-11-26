@@ -37,7 +37,7 @@
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
   pdftitle={Stochastic Processes: Assignment 1},
-  pdfauthor={Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu Zhang, Daniel Alonso},
+  pdfauthor={Group 1: Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu Zhang, Daniel Alonso},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
@@ -104,8 +104,8 @@
 \fi
 
 \title{Stochastic Processes: Assignment 1}
-\author{Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu
-Zhang, Daniel Alonso}
+\author{Group 1: Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun,
+Danyu Zhang, Daniel Alonso}
 \date{November 27th, 2020}
 
 \begin{document}
@@ -170,9 +170,11 @@ We have first calculated the relative frequencies manually.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# importing the data}
 \FunctionTok{load}\NormalTok{(}\StringTok{\textquotesingle{}PollutionMadrid.RData\textquotesingle{}}\NormalTok{)}
-\NormalTok{data }\OtherTok{\textless{}{-}}\NormalTok{  X[}\DecValTok{1}\NormalTok{,]}
-\NormalTok{mat }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{36}\NormalTok{), }\AttributeTok{nrow=}\DecValTok{6}\NormalTok{, }\AttributeTok{byrow=}\NormalTok{T)}
+\NormalTok{data }\OtherTok{\textless{}{-}}\NormalTok{  X[}\DecValTok{1}\NormalTok{,] }\CommentTok{\# selecting the first line (as we are group 1)}
+\NormalTok{mat }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{36}\NormalTok{), }\AttributeTok{nrow=}\DecValTok{6}\NormalTok{, }\AttributeTok{byrow=}\NormalTok{T) }\CommentTok{\# creating an empty 6x6 matrix}
+\CommentTok{\# we substitute the characters with numbers for easier manipulation}
 \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(data)) \{}
   \ControlFlowTok{if}\NormalTok{ (data[i] }\SpecialCharTok{==} \StringTok{"Alert"}\NormalTok{) \{}
 \NormalTok{    data[i] }\OtherTok{=} \DecValTok{1}
@@ -188,12 +190,16 @@ We have first calculated the relative frequencies manually.
 \NormalTok{    data[i] }\OtherTok{=} \DecValTok{6}
 \NormalTok{  \}}
 \NormalTok{\}}
+
+\CommentTok{\# Count transitions and add them to the matrix}
 \NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(data)}
 \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(data)) \{}
 \NormalTok{  mat[data[i],data[i}\SpecialCharTok{+}\DecValTok{1}\NormalTok{]] }\OtherTok{=}\NormalTok{ mat[data[i],data[i}\SpecialCharTok{+}\DecValTok{1}\NormalTok{]] }\SpecialCharTok{+} \DecValTok{1}
 \NormalTok{\}}
+\CommentTok{\# matrix wraps around so we count the last element \textgreater{} first element transition}
 \NormalTok{mat[data[}\DecValTok{1460}\NormalTok{],data[}\DecValTok{1}\NormalTok{]] }\OtherTok{=}\NormalTok{ mat[data[}\DecValTok{1460}\NormalTok{],data[}\DecValTok{1}\NormalTok{]] }\SpecialCharTok{+} \DecValTok{1}
 
+\CommentTok{\# Frequency table in order to create relative frequencies in transition matrix}
 \NormalTok{tbl }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(data)}
 \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(tbl)) \{}
 \NormalTok{  mat[i,] }\OtherTok{=}\NormalTok{ mat[i,]}\SpecialCharTok{/}\NormalTok{tbl[i]}
@@ -291,6 +297,7 @@ a unique stationary distribution.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# function to calculate stationary distribution of a transition matrix}
 \NormalTok{stationary\_dist }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(P) \{}
 \NormalTok{    dim }\OtherTok{=} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{length}\NormalTok{(P))}
 \NormalTok{    A }\OtherTok{=}\NormalTok{ P }\SpecialCharTok{{-}} \FunctionTok{diag}\NormalTok{(dim)}
@@ -314,7 +321,7 @@ a unique stationary distribution.
 \end{Highlighting}
 \end{Shaded}
 
-This is our stationary distribution:
+Which yields the following stationary distribution:
 
 \(\pi_{1} = 0.00273973\)
 
@@ -520,8 +527,8 @@ We simulate \(n=30\) steps to test the function with initial value
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{sim}\NormalTok{(}\DecValTok{100}\NormalTok{,}\DecValTok{30}\NormalTok{,}\FloatTok{0.95}\NormalTok{)}
-\CommentTok{\#\textgreater{}  [1] 100   0   1   2   3   4   5   6   7   8   9   0   1   2   3   4   5   6   7}
-\CommentTok{\#\textgreater{} [20]   8   9  10  11  12  13  14  15  16  17  18}
+\CommentTok{\#\textgreater{}  [1] 100   0   1   2   3   4   5   6   7   8   0   1   2   3   4   5   6   0   1}
+\CommentTok{\#\textgreater{} [20]   2   3   4   5   6   7   8   9  10  11  12}
 \end{Highlighting}
 \end{Shaded}
 
@@ -533,6 +540,7 @@ between {[}100,1000{]}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# simulating trajectories}
 \NormalTok{initial\_x }\OtherTok{=} \FunctionTok{sample}\NormalTok{((}\DecValTok{100}\SpecialCharTok{:}\DecValTok{1000}\NormalTok{), }\DecValTok{8}\NormalTok{)}
 \NormalTok{trajs }\OtherTok{=} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{8}\SpecialCharTok{*}\DecValTok{1000}\NormalTok{),}\AttributeTok{nrow=}\DecValTok{1000}\NormalTok{,}\AttributeTok{byrow=}\NormalTok{T)}
 \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{8}\NormalTok{) \{}
@@ -543,6 +551,7 @@ between {[}100,1000{]}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# plotting trajectories}
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{mar=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{))}
 \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{8}\NormalTok{) \{}
     \FunctionTok{plot}\NormalTok{(trajs[,i], }\AttributeTok{ylim=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1001}\NormalTok{))}
@@ -568,7 +577,7 @@ Our maximums per simulation are always the initial value:
 \NormalTok{    maximums[i] }\OtherTok{=} \FunctionTok{max}\NormalTok{(trajs[,i])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{\#\textgreater{} [1] 279 656 687 903 665 137 260 518}
+\CommentTok{\#\textgreater{} [1] 595 200 299 659 361 412 109 784}
 \end{Highlighting}
 \end{Shaded}
 
@@ -581,7 +590,7 @@ While the second highest values will be the followings:
 \NormalTok{    maximums[i] }\OtherTok{=} \FunctionTok{max}\NormalTok{(trajs[,i][}\DecValTok{2}\SpecialCharTok{:}\DecValTok{1000}\NormalTok{])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{\#\textgreater{} [1]  8  9  8 10  9  7 10 12}
+\CommentTok{\#\textgreater{} [1]  7  9  9  8 10  8  9  7}
 \end{Highlighting}
 \end{Shaded}
 

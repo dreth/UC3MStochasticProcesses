@@ -1,6 +1,6 @@
 ---
 title: 'Stochastic Processes: Assignment 1'
-author: "Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu Zhang, Daniel Alonso"
+author: "Group 1: Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu Zhang, Daniel Alonso"
 date: "November 27th, 2020"
 output: 'pdf_document'
 ---
@@ -57,9 +57,11 @@ All states have finite expected return times and there is only a single communic
 We have first calculated the relative frequencies manually.
 
 ```{r, echo=TRUE, warning=FALSE}
+# importing the data
 load('PollutionMadrid.RData')
-data <-  X[1,]
-mat <- matrix(rep(0,36), nrow=6, byrow=T)
+data <-  X[1,] # selecting the first line (as we are group 1)
+mat <- matrix(rep(0,36), nrow=6, byrow=T) # creating an empty 6x6 matrix
+# we substitute the characters with numbers for easier manipulation
 for (i in 1:length(data)) {
   if (data[i] == "Alert") {
     data[i] = 1
@@ -75,12 +77,16 @@ for (i in 1:length(data)) {
     data[i] = 6
   }
 }
+
+# Count transitions and add them to the matrix
 data <- as.numeric(data)
 for (i in 1:length(data)) {
   mat[data[i],data[i+1]] = mat[data[i],data[i+1]] + 1
 }
+# matrix wraps around so we count the last element > first element transition
 mat[data[1460],data[1]] = mat[data[1460],data[1]] + 1
 
+# Frequency table in order to create relative frequencies in transition matrix
 tbl <- table(data)
 for (i in 1:length(tbl)) {
   mat[i,] = mat[i,]/tbl[i]
@@ -132,6 +138,7 @@ We can see the probability is 0.713843
 We can see that because we have a unique solution to the system, we have a unique stationary distribution.
 
 ```{r, echo=TRUE, warning=FALSE}
+# function to calculate stationary distribution of a transition matrix
 stationary_dist <- function(P) {
     dim = sqrt(length(P))
     A = P - diag(dim)
@@ -144,7 +151,7 @@ stat_dist <- stationary_dist(mat)
 stat_dist
 ```
 
-This is our stationary distribution:
+Which yields the following stationary distribution:
 
 $\pi_{1} = 0.00273973$
 
@@ -321,6 +328,7 @@ sim(100,30,0.95)
 We generate 8 trajectories of length 1000 with different intiial values between [100,1000]
 
 ```{r, echo=TRUE, warning=FALSE, results='hide'}
+# simulating trajectories
 initial_x = sample((100:1000), 8)
 trajs = matrix(rep(0,8*1000),nrow=1000,byrow=T)
 for (i in 1:8) {
@@ -329,6 +337,7 @@ for (i in 1:8) {
 ```
 
 ```{r, echo=TRUE, warning=FALSE}
+# plotting trajectories
 par(mfrow=c(4,2), mar=c(1,1,1,1))
 for (i in 1:8) {
     plot(trajs[,i], ylim=c(0,1001))
