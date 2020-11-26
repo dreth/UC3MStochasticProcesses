@@ -36,8 +36,8 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={Assignment 1},
-  pdfauthor={Group 1},
+  pdftitle={Stochastic Processes: Assignment 1},
+  pdfauthor={Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu Zhang, Daniel Alonso},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
@@ -103,9 +103,10 @@
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 
-\title{Assignment 1}
-\author{Group 1}
-\date{November 22th, 2020}
+\title{Stochastic Processes: Assignment 1}
+\author{Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu
+Zhang, Daniel Alonso}
+\date{November 27th, 2020}
 
 \begin{document}
 \maketitle
@@ -119,10 +120,11 @@ Importing libraries
 \end{Highlighting}
 \end{Shaded}
 
-Functions to solve the problems
+Function to solve the problems
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# Thanks profe!}
 \NormalTok{matrixpower }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(M,k) \{}
   \ControlFlowTok{if}\NormalTok{(}\FunctionTok{dim}\NormalTok{(M)[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{!=}\FunctionTok{dim}\NormalTok{(M)[}\DecValTok{2}\NormalTok{]) }\FunctionTok{return}\NormalTok{(}\FunctionTok{print}\NormalTok{(}\StringTok{"Error: matrix M is not square"}\NormalTok{))}
   \ControlFlowTok{if}\NormalTok{ (k }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{return}\NormalTok{(}\FunctionTok{diag}\NormalTok{(}\FunctionTok{dim}\NormalTok{(M)[}\DecValTok{1}\NormalTok{])) }
@@ -518,8 +520,8 @@ We simulate \(n=30\) steps to test the function with initial value
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{sim}\NormalTok{(}\DecValTok{100}\NormalTok{,}\DecValTok{30}\NormalTok{,}\FloatTok{0.95}\NormalTok{)}
-\CommentTok{\#\textgreater{}  [1] 100   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17}
-\CommentTok{\#\textgreater{} [20]  18  19  20  21  22  23  24  25  26  27  28}
+\CommentTok{\#\textgreater{}  [1] 100   0   1   2   3   4   5   6   7   8   9   0   1   2   3   4   5   6   7}
+\CommentTok{\#\textgreater{} [20]   8   9  10  11  12  13  14  15  16  17  18}
 \end{Highlighting}
 \end{Shaded}
 
@@ -566,7 +568,7 @@ Our maximums per simulation are always the initial value:
 \NormalTok{    maximums[i] }\OtherTok{=} \FunctionTok{max}\NormalTok{(trajs[,i])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{\#\textgreater{} [1] 510 203 146 463 180 855 523 884}
+\CommentTok{\#\textgreater{} [1] 279 656 687 903 665 137 260 518}
 \end{Highlighting}
 \end{Shaded}
 
@@ -579,7 +581,7 @@ While the second highest values will be the followings:
 \NormalTok{    maximums[i] }\OtherTok{=} \FunctionTok{max}\NormalTok{(trajs[,i][}\DecValTok{2}\SpecialCharTok{:}\DecValTok{1000}\NormalTok{])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{\#\textgreater{} [1] 11  9 10  8  8  8  7  9}
+\CommentTok{\#\textgreater{} [1]  8  9  8 10  9  7 10 12}
 \end{Highlighting}
 \end{Shaded}
 

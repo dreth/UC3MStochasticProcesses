@@ -1,7 +1,7 @@
 ---
-title: 'Assignment 1'
-author: "Group 1"
-date: "November 22th, 2020"
+title: 'Stochastic Processes: Assignment 1'
+author: "Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu Zhang, Daniel Alonso"
+date: "November 27th, 2020"
 output: 'pdf_document'
 ---
 
@@ -20,9 +20,10 @@ library(markovchain)
 library(matlib)
 ```
 
-Functions to solve the problems
+Function to solve the problems
 
 ```{r, echo=TRUE, warning=FALSE}
+# Thanks profe!
 matrixpower <- function(M,k) {
   if(dim(M)[1]!=dim(M)[2]) return(print("Error: matrix M is not square"))
   if (k == 0) return(diag(dim(M)[1])) 
