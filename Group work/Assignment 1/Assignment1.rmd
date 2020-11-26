@@ -5,6 +5,24 @@ date: "November 22th, 2020"
 output: 'pdf_document'
 ---
 
+Importing libraries
+
+```{r, echo=TRUE, warning=FALSE}
+library(markovchain)
+library(matlib)
+```
+
+Functions to solve the problems
+
+```{r, echo=TRUE, warning=FALSE}
+matrixpower <- function(M,k) {
+  if(dim(M)[1]!=dim(M)[2]) return(print("Error: matrix M is not square"))
+  if (k == 0) return(diag(dim(M)[1])) 
+  if (k == 1) return(M)
+  if (k > 1)  return(M %*% matrixpower(M, k-1))
+}
+```
+
 # Problem 1
 
 ## a)
@@ -21,9 +39,113 @@ $X_{n}$ is the scenario at time $n$
 
 All states have finite expected return times and are communicated with each other, also the MC is irreducible, therefore its stationary distribution is **unique**.
 
+![Graph for prob.1](./grafo1.png)
+
+\newpage
+
 ## b)
 
-![Graph for prob.1](./grafo1.png)
+We have first calculated the relative frequencies manually.
+
+```{r, echo=TRUE, warning=FALSE}
+load('PollutionMadrid.RData')
+data <-  X[1,]
+mat <- matrix(rep(0,36), nrow=6, byrow=T)
+for (i in 1:length(data)) {
+  if (data[i] == "Alert") {
+    data[i] = 1
+  } else if (data[i] == "NR") {
+    data[i] = 2
+  } else if (data[i] == "Sc1") {
+    data[i] = 3
+  } else if (data[i] == "Sc2") {
+    data[i] = 4 
+  } else if (data[i] == "Sc3") {
+    data[i] = 5
+  } else if (data[i] == "Sc4") {
+    data[i] = 6
+  }
+}
+data <- as.numeric(data)
+for (i in 1:length(data)) {
+  mat[data[i],data[i+1]] = mat[data[i],data[i+1]] + 1
+}
+mat[data[1460],data[1]] = mat[data[1460],data[1]] + 1
+
+tbl <- table(data)
+for (i in 1:length(tbl)) {
+  mat[i,] = mat[i,]/tbl[i]
+}
+mat
+```
+
+\newpage
+
+We then tested using the *markovchain* package in order to confirm our results.
+
+```{r, echo=TRUE, warning=FALSE}
+data <- X[1,]
+markovchainFit(data)$estimate
+```
+
+&nbsp;
+
+### What can you say of the comparison of your estimates andthe possible transitions between states that you had argued in part a
+
+According to our probabilities shown in the graph. There are 3 arrows with probability 0. This is due to the fact that in the data there are zero transitions from $Sc2 \rightarrow Alert$, $Sc4 \rightarrow Alert$, $NR \rightarrow Alert$, $Alert \rightarrow Alert$.
+
+This is logical given that it is very unlikely to hit an alert state. Unlike the rest of the states.
+
+Later it will be shown that there's a unique stationary distribution (see 1d).
+
+![Graph with probabilities for problem 1 (b)](./grafo1_probs.png)
+
+\newpage
+
+## c)
+
+Given that the first state of the chain is NR. We see the following 7 states:
+
+```{r, echo=TRUE, warning=FALSE}
+data[1:7]
+```
+
+And we calculate the probability as follows:
+
+```{r, echo=TRUE, warning=FALSE}
+mat[2,2]^7
+```
+
+We can see the probability is 0.713843
+
+## d)
+
+We can see that because we have a unique solution to the system, we have a unique stationary distribution.
+
+```{r, echo=TRUE, warning=FALSE}
+stationary_dist <- function(P) {
+    dim = sqrt(length(P))
+    mat = matrix(P,nrow=dim, byrow=T)
+    A = mat - diag(dim)
+    b = c(1,rep(0,dim-1))
+    A[,1] <- rep(1,dim)
+
+    print("The solution is the following:")
+    pi <- matlib::Solve(A, b, fractions = TRUE)
+}
+stationary_dist(mat)
+```
+
+
+## e)
+
+Taking the 120th power of our transition matrix we get the following:
+
+```{r, echo=TRUE, warning=FALSE}
+matrixpower(mat,120)
+```
+
+
 
 \newpage
 
@@ -33,7 +155,7 @@ All states have finite expected return times and are communicated with each othe
 
 We set up the following system of equations:
 
-$\sum_{i=0} P_{i,0} \pi_{i} = \pi_{1}$
+$\sum_{i=0} \pi_{i} P_{i,0}  = \pi_{1}$
 
 $\sum_{i=1} \pi_{i} = 1$
 
@@ -67,30 +189,7 @@ $E[T_{i}|X_{0} = i] = \mu_{i} = \frac{1}{\pi_{i}}$
 
 Because it has a unique stationary distribution, it can only have one communication class (it is irreducible), all states are recurring states and there is no transient state.
 
-
-
-
-
-
-4 cycle {2,4}
-
-5 cycle {}
-
-{1,2}
-
 ## c)
-
-```{r, echo=TRUE, warning=FALSE}
-matrixpower <- function(M,k) {
-  # ARGUMENTS:
-  # M: square matrix 
-  # k: exponent
-  if(dim(M)[1]!=dim(M)[2]) return(print("Error: matrix M is not square"))
-  if (k == 0) return(diag(dim(M)[1]))  # if k=0 returns the identity matrix
-  if (k == 1) return(M)
-  if (k > 1)  return(M %*% matrixpower(M, k-1)) # if k>1 recursively apply the function
-}
-```
 
 ```{r, echo=TRUE, warning=FALSE}
 mc <- function(p, sequences ,steps) {
@@ -106,6 +205,5 @@ mc <- function(p, sequences ,steps) {
     }
     return(MarkovChain)
 }
-
-
 ```
+
