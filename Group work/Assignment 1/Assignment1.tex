@@ -435,34 +435,56 @@ Approximately a week.
 
 We set up the following system of equations:
 
-\(\sum_{i=0} \pi_{i} P_{i,0} = \pi_{1}\)
-
-\(\sum_{i=1} \pi_{i} = 1\)
-
-\((1 - p) \pi_{1} = \pi_{2}\\\) \(\dots\)
-\((1 - p) \pi_{n-2} = \pi_{n-1}\\\) \(\dots\)
+\(\begin{cases} \sum_{i \in \mathbb{N} \cup \{0\}} \pi_{i} P_{i,0} = \pi_{1} \\ \sum_{i \in \mathbb{N} \cup \{0\}} \pi_{i} = 1 \\ (1 - p) \pi_{1} = \pi_{2} \\ \dots \\ (1 - p) \pi_{n-2} = \pi_{n-1} \\ \dots \\ \end{cases}\)
 
 For the first equation, each \(P_{i,0} = p\), therefore:
 
-\(\sum_{i=0} P_{i,0} \pi_{i} = \pi_{1} \Rightarrow p \sum_{i=1} \pi_{i} = \pi_{1}\)
+\(\sum_{i \in \mathbb{N} \cup \{0\}} P_{i,0} \pi_{i} = \pi_{1} \Rightarrow p \sum_{i \in \mathbb{N} \cup \{0\}} \pi_{i} = \pi_{1}\)
+
+And we get:
 
 \(p = \pi_{1}\)
 
-\((1 - p)p = \pi_{2}\) \((1 - p)^{2} p = \pi_{3}\) \(\dots\)
-\((1 - p)^{n-1} p = \pi_{n}\) \(\dots\)
+For the rest of the equations we have the following:
 
-Then, we get:
+\((1 - p)p = \pi_{2}, (1 - p)^{2} p = \pi_{3}, \dots, (1 - p)^{n-1} p = \pi_{n}, \dots\)
+
+Then, we get the following result:
+
+\(p + (1-p)p + (1-p)^{2} p + \dots + (1-p)^{n-1} + \dots = \sum_{i \in \mathbb{N} \cup \{0\}} \pi_{i} = 1\)
+
+The left side of this equation can be summarized by a summation:
+
+\(p \sum_{i \in \mathbb{N} \cup \{0\}} (1-p)^{k} = \sum_{i \in \mathbb{N} \cup \{0\}} \pi_{i} = 1\)
+
+The summation on the left hand side is a geometric series where
+\(\langle{(1-p)} < 1\), therefore:
+
+\(p * \frac{1}{1 - (1 - p)} = 1\)
+
+This series confirms that \(\pi P = \pi\) because:
+
+\(\begin{bmatrix} p & (1 - p)p & \dots & (1 - p)^{n} p & \dots \end{bmatrix} \begin{bmatrix} p & 1-p & \dots 0 \\ \vdots & \vdots & \ddots \end{bmatrix} = \pi\)
+
+Performing this matrix product we get:
+
+\(\begin{cases} \pi_{1} = p \\ \pi_{2} = p (1-p) \\ \pi_{3} = p (1-p)^{2} \\ \dots \\ \pi_{n} = p (1-p)^{n-1} \\ \dots \end{cases}\)
+
+Which is the stationary distribution of the chain.
 
 Because our MC is an irreducible infinite state MC, we have a unique
-stationary distribution \(\pi\), \(\pi_{i} = \frac{1}{\mu_{i}}\) and all
-states have expected finite return times then we have:
+stationary distribution \(\pi\), \(\pi_{i} = \frac{1}{\mu_{i}}\) and not
+all states have expected finite return times then we have:
 
 \(E[T_{i}|X_{0} = i] = \mu_{i} = \frac{1}{\pi_{i}}\)
+
+\newpage
 
 \hypertarget{b-1}{%
 \subsection{b)}\label{b-1}}
 
-As it is aperiodic and irreducible MC it has a limiting distribution.
+As it is aperiodic and irreducible markov chain, it has a limiting
+distribution.
 
 \hypertarget{c-1}{%
 \subsection{c)}\label{c-1}}
@@ -496,8 +518,8 @@ We simulate \(n=30\) steps to test the function with initial value
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{sim}\NormalTok{(}\DecValTok{100}\NormalTok{,}\DecValTok{30}\NormalTok{,}\FloatTok{0.95}\NormalTok{)}
-\CommentTok{\#\textgreater{}  [1] 100   0   0   1   2   0   1   2   3   4   5   6   7   8   9  10  11  12  13}
-\CommentTok{\#\textgreater{} [20]  14  15  16  17  18  19  20  21  22   0   1}
+\CommentTok{\#\textgreater{}  [1] 100   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17}
+\CommentTok{\#\textgreater{} [20]  18  19  20  21  22  23  24  25  26  27  28}
 \end{Highlighting}
 \end{Shaded}
 
@@ -544,7 +566,7 @@ Our maximums per simulation are always the initial value:
 \NormalTok{    maximums[i] }\OtherTok{=} \FunctionTok{max}\NormalTok{(trajs[,i])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{\#\textgreater{} [1] 582 635 984 430 694 493 184 662}
+\CommentTok{\#\textgreater{} [1] 510 203 146 463 180 855 523 884}
 \end{Highlighting}
 \end{Shaded}
 
@@ -557,7 +579,7 @@ While the second highest values will be the followings:
 \NormalTok{    maximums[i] }\OtherTok{=} \FunctionTok{max}\NormalTok{(trajs[,i][}\DecValTok{2}\SpecialCharTok{:}\DecValTok{1000}\NormalTok{])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{\#\textgreater{} [1]  7  8  8  9  6 10  9  9}
+\CommentTok{\#\textgreater{} [1] 11  9 10  8  8  8  7  9}
 \end{Highlighting}
 \end{Shaded}
 
