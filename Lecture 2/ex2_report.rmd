@@ -131,5 +131,15 @@ $\begin{pmatrix}
 0 & 0 & 0 & 0           & \frac{1}{4} & \frac{3}{4}
 \end{pmatrix}$
 
+```{r, echo=TRUE, warning=FALSE}
+matrixpower(P,50)
+```
+
+
 ### b - Determine the proportion of days that she runs barefooted.
 
+Take the powers of the transition matrix.
+
+```{r, echo=TRUE, warning=FALSE}
+matrixpower(P,50)
+```
