@@ -8,3 +8,15 @@ matrixpower <- function(M,k) {
   if (k > 1)  return(M %*% matrixpower(M, k-1)) # if k>1 recursively apply the function
 }
 
+P <- c(0.05, 0.25, 0.25, 0.3, 0.15,
+        0.4, 0.05, 0.05, 0.2,  0.3,
+        0.2,  0.2,    0, 0.3,  0.3,
+        0.3,  0.2,  0.2, 0.1,  0.2,
+        0.2, 0.25,  0.3, 0.1, 0.15)
+P <- matrix(P,nrow=5,byrow=T)
+
+dist <- matrixpower(P, 150)
+
+result <- mean(matrix(c(5,6,6,4,4), nrow=1, byrow=T)%*%dist)
+result
+
