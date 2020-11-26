@@ -125,17 +125,44 @@ We can see that because we have a unique solution to the system, we have a uniqu
 ```{r, echo=TRUE, warning=FALSE}
 stationary_dist <- function(P) {
     dim = sqrt(length(P))
-    mat = matrix(P,nrow=dim, byrow=T)
-    A = mat - diag(dim)
-    b = c(1,rep(0,dim-1))
+    A = P - diag(dim)
+    b = matrix(c(1,rep(0,dim-1)),nrow=dim,byrow=T)
     A[,1] <- rep(1,dim)
-
     print("The solution is the following:")
-    pi <- matlib::Solve(A, b, fractions = TRUE)
+    return(matlib::Solve(t(A), b))
 }
-stationary_dist(mat)
+stat_dist <- stationary_dist(mat)
+stat_dist
 ```
 
+This is our stationary distribution:
+
+$\pi_{1} = 0.00273973$
+
+$\pi_{2} = 0.91780822$
+
+$\pi_{3} = 0.04315068$
+
+$\pi_{4} = 0.02123288$
+
+$\pi_{5} = 0.00890411$
+
+$\pi_{6} = 0.00616438$
+
+\newpage
+
+Comparing with the proportions we get from our data:
+
+```{r, echo=TRUE, warning=FALSE}
+rel_error = c()
+props = table(data)/length(data)
+results <- c(0.00273973,0.91780822,0.04315068,0.02123288,0.00890411,0.00616438)
+for (i in 1:length(props)) {
+    rel_error[i] <- abs(props[i]-results[i])/results[i]
+}
+```
+
+We can see our relative errors are all quite low (<$1*10^{-5}$) 
 
 ## e)
 

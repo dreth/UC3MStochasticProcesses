@@ -304,27 +304,69 @@ a unique stationary distribution.
 \begin{Highlighting}[]
 \NormalTok{stationary_dist <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(P) \{}
 \NormalTok{    dim =}\StringTok{ }\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{length}\NormalTok{(P))}
-\NormalTok{    mat =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(P,}\DataTypeTok{nrow=}\NormalTok{dim, }\DataTypeTok{byrow=}\NormalTok{T)}
-\NormalTok{    A =}\StringTok{ }\NormalTok{mat }\OperatorTok{-}\StringTok{ }\KeywordTok{diag}\NormalTok{(dim)}
-\NormalTok{    b =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,dim}\DecValTok{-1}\NormalTok{))}
+\NormalTok{    A =}\StringTok{ }\NormalTok{P }\OperatorTok{-}\StringTok{ }\KeywordTok{diag}\NormalTok{(dim)}
+\NormalTok{    b =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,dim}\DecValTok{-1}\NormalTok{)),}\DataTypeTok{nrow=}\NormalTok{dim,}\DataTypeTok{byrow=}\NormalTok{T)}
 \NormalTok{    A[,}\DecValTok{1}\NormalTok{] <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,dim)}
-
     \KeywordTok{print}\NormalTok{(}\StringTok{"The solution is the following:"}\NormalTok{)}
-\NormalTok{    pi <-}\StringTok{ }\NormalTok{matlib}\OperatorTok{::}\KeywordTok{Solve}\NormalTok{(A, b, }\DataTypeTok{fractions =} \OtherTok{TRUE}\NormalTok{)}
+    \KeywordTok{return}\NormalTok{(matlib}\OperatorTok{::}\KeywordTok{Solve}\NormalTok{(}\KeywordTok{t}\NormalTok{(A), b))}
 \NormalTok{\}}
-\KeywordTok{stationary_dist}\NormalTok{(mat)}
+\NormalTok{stat_dist <-}\StringTok{ }\KeywordTok{stationary_dist}\NormalTok{(mat)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
 ## [1] "The solution is the following:"
-## x1            =             1/6 
-##   x2          =  17201996/66847 
-##     x3        =      39543/3224 
-##       x4      =         645/104 
-##         x5    =        2059/744 
-##           x6  =       3725/1681
+## x1            =  0.00273973 
+##   x2          =  0.91780822 
+##     x3        =  0.04315068 
+##       x4      =  0.02123288 
+##         x5    =  0.00890411 
+##           x6  =  0.00616438
 \end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{stat_dist}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "x1            =  0.00273973" "  x2          =  0.91780822"
+## [3] "    x3        =  0.04315068" "      x4      =  0.02123288"
+## [5] "        x5    =  0.00890411" "          x6  =  0.00616438"
+\end{verbatim}
+
+This is our stationary distribution:
+
+\(\pi_{1} = 0.00273973\)
+
+\(\pi_{2} = 0.91780822\)
+
+\(\pi_{3} = 0.04315068\)
+
+\(\pi_{4} = 0.02123288\)
+
+\(\pi_{5} = 0.00890411\)
+
+\(\pi_{6} = 0.00616438\)
+
+\newpage
+
+Comparing with the proportions we get from our data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rel_error =}\StringTok{ }\KeywordTok{c}\NormalTok{()}
+\NormalTok{props =}\StringTok{ }\KeywordTok{table}\NormalTok{(data)}\OperatorTok{/}\KeywordTok{length}\NormalTok{(data)}
+\NormalTok{results <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\FloatTok{0.00273973}\NormalTok{,}\FloatTok{0.91780822}\NormalTok{,}\FloatTok{0.04315068}\NormalTok{,}\FloatTok{0.02123288}\NormalTok{,}\FloatTok{0.00890411}\NormalTok{,}\FloatTok{0.00616438}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(props)) \{}
+\NormalTok{    rel_error[i] <-}\StringTok{ }\KeywordTok{abs}\NormalTok{(props[i]}\OperatorTok{-}\NormalTok{results[i])}\OperatorTok{/}\NormalTok{results[i]}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+We can see our relative errors are all quite low
+(\textless{}\(1*10^{-5}\))
 
 \hypertarget{e}{%
 \subsection{e)}\label{e}}
