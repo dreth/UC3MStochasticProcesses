@@ -262,7 +262,7 @@ The left side of this equation can be summarized by a summation:
 
 $p \sum_{i \in \mathbb{N} \cup \{0\}} (1-p)^{k} =  \sum_{i \in \mathbb{N} \cup \{0\}} \pi_{i} = 1$
 
-The summation on the left hand side is a geometric series where $\langle{(1-p)} < 1$, therefore:
+The summation on the left hand side is a geometric series where $|(1-p)| < 1$, therefore:
 
 $p * \frac{1}{1 - (1 - p)} = 1$
 
@@ -283,17 +283,36 @@ $\begin{cases}
 \dots
 \end{cases}$
 
+
+
 Which is the stationary distribution of the chain.
 
-Because our MC is an irreducible infinite state MC, we have a unique stationary distribution $\pi$, $\pi_{i} = \frac{1}{\mu_{i}}$ and not all states have expected finite return times then we have:
+![Graph for problem 2a](./grafo2.png)
+
+Because our MC is an irreducible infinite state MC, state 0 is a recurrent state and given that the matrix is irreducible, it is a recurrent MC. 
+
+We have a single communication class therefore it's irreducible.
+
+Zero has period 1, so all states have period 1 and therefore the MC aperiodic.
+
+**write 3 in latex**
+
+**write expected return time to 0**
+
+$\pi_{i} = \frac{1}{p} * (1-p)^{i}$ for all $i \in \mathbb{N} \cup \{0\}$
+
+State 0 is positive recurrent and so are all the rest of the states in the MC. 
+
+As we have a unique stationary distribution $\pi$, $\pi_{i} = \frac{1}{\mu_{i}}$ and all states have expected finite return times then we have:
 
 $E[T_{i}|X_{0} = i] = \mu_{i} = \frac{1}{\pi_{i}}$
+
 
 \newpage
 
 ## b)
 
-As it is aperiodic and irreducible markov chain, it has a limiting distribution.
+As it is aperiodic and irreducible markov chain, it has a limiting distribution, as all states are positive recurrent.
 
 ## c)
 
@@ -344,7 +363,7 @@ for (i in 1:8) {
 }
 ```
 
-The limiting distribution of this chain does not really depend at all on the first value. As such initial value could be a high number (between 100-1000), given that the probability corresponding to our group number ($k=1$) produces a very high $p=\frac{1}{1+k} = \frac{1}{2}$, therefore the chain drops very quickly to 0 and remains there without climbing values very much.
+The limiting distribution of this chain does not really depend at all on the first value. As such initial value could be a high number (between 100-1000), given that the probability corresponding to our group number ($k=1$) produces a very high $p=\frac{1}{1+k} = \frac{1}{2}$, therefore the chain drops very quickly to 0 and takes a really large number of steps to go back to its initial value.
 
 Our maximums per simulation are always the initial value:
 
