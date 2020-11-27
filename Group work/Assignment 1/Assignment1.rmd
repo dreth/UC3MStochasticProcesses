@@ -283,30 +283,53 @@ $\begin{cases}
 \dots
 \end{cases}$
 
+Basically:
 
+$\pi_{i} = p (1-p)^{i-1}$ for all $i \in \mathbb{N} \cup \{0\}$
 
 Which is the stationary distribution of the chain.
 
 ![Graph for problem 2a](./grafo2.png)
 
+\newpage
+
 Because our MC is an irreducible infinite state MC, state 0 is a recurrent state and given that the matrix is irreducible, it is a recurrent MC. 
 
-We have a single communication class therefore it's irreducible.
+1 - We have a single communication class therefore it's irreducible.
 
-Zero has period 1, so all states have period 1 and therefore the MC aperiodic.
+2 - Zero has period 1, so all states have period 1 and therefore the MC aperiodic.
 
-**write 3 in latex**
+3 - We calculate the probability of returning to 0 in exactly $n$ steps:
 
-**write expected return time to 0**
+$f_{00} = \sum_{n > 1} P($ returning to 0 in exactly n steps $)$
 
-$\pi_{i} = \frac{1}{p} * (1-p)^{i}$ for all $i \in \mathbb{N} \cup \{0\}$
+$= \sum_{n > 1} (f_{00})^{n} = p + (1-p)p + \dots + (1-p)^{n} p + \dots$
+
+$= p \sum_{n > 1} (1-p)^{k} = \frac{p}{1 - (1 - p)} = \frac{p}{p} = 1$
+
+Then we calculate the expected return time to zero:
+
+$E[$return time to 0$] = \sum_{n > 0} n(f_{00})^{n} = 1*p + 2p(1-p) + \dots + n(1-p)^{n-1}  p + \dots$
+
+$= p \sum_{n>0} (1-p)^{n-1} = p \sum_{n>0} \frac{n(1-p)^{n}}{(1-p)}$
+
+$= \frac{p}{1-p} \sum_{n>0} n(1-p)^{n}$ with $p \neq 1,0$
+
+We know that:
+
+$n(1-p)^{n} = \frac{n(1-p)^{n}}{(n-1)(1-p)^{n-1}}$
+
+and using the ratio test for this series:
+
+$\lim_{n \rightarrow \infty} \frac{|n(1-p)^{n}|}{|(n-1)(1-p)^{n-1}|} = \lim_{n \rightarrow \infty} \frac{|n|}{|n-1|} (1-p) = 1-p < 1$
+
+Therefore our series converges for all $p \neq 0$.
 
 State 0 is positive recurrent and so are all the rest of the states in the MC. 
 
 As we have a unique stationary distribution $\pi$, $\pi_{i} = \frac{1}{\mu_{i}}$ and all states have expected finite return times then we have:
 
 $E[T_{i}|X_{0} = i] = \mu_{i} = \frac{1}{\pi_{i}}$
-
 
 \newpage
 

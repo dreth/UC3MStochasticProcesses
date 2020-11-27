@@ -480,6 +480,10 @@ Performing this matrix product we get:
 
 \(\begin{cases} \pi_{1} = p \\ \pi_{2} = p (1-p) \\ \pi_{3} = p (1-p)^{2} \\ \dots \\ \pi_{n} = p (1-p)^{n-1} \\ \dots \end{cases}\)
 
+Basically:
+
+\(\pi_{i} = p (1-p)^{i-1}\) for all \(i \in \mathbb{N} \cup \{0\}\)
+
 Which is the stationary distribution of the chain.
 
 \begin{figure}
@@ -488,21 +492,44 @@ Which is the stationary distribution of the chain.
 \caption{Graph for problem 2a}
 \end{figure}
 
+\newpage
+
 Because our MC is an irreducible infinite state MC, state 0 is a
 recurrent state and given that the matrix is irreducible, it is a
 recurrent MC.
 
-We have a single communication class therefore it's irreducible.
+1 - We have a single communication class therefore it's irreducible.
 
-Zero has period 1, so all states have period 1 and therefore the MC
+2 - Zero has period 1, so all states have period 1 and therefore the MC
 aperiodic.
 
-\textbf{write 3 in latex}
+3 - We calculate the probability of returning to 0 in exactly \(n\)
+steps:
 
-\textbf{write expected return time to 0}
+\(f_{00} = \sum_{n > 1} P(\) returning to 0 in exactly n steps \()\)
 
-\(\pi_{i} = \frac{1}{p} * (1-p)^{i}\) for all
-\(i \in \mathbb{N} \cup \{0\}\)
+\(= \sum_{n > 1} (f_{00})^{n} = p + (1-p)p + \dots + (1-p)^{n} p + \dots\)
+
+\(= p \sum_{n > 1} (1-p)^{k} = \frac{p}{1 - (1 - p)} = \frac{p}{p} = 1\)
+
+Then we calculate the expected return time to zero:
+
+\(E[\)return time to
+0\(] = \sum_{n > 0} n(f_{00})^{n} = 1*p + 2p(1-p) + \dots + n(1-p)^{n-1} p + \dots\)
+
+\(= p \sum_{n>0} (1-p)^{n-1} = p \sum_{n>0} \frac{n(1-p)^{n}}{(1-p)}\)
+
+\(= \frac{p}{1-p} \sum_{n>0} n(1-p)^{n}\) with \(p \neq 1,0\)
+
+We know that:
+
+\(n(1-p)^{n} = \frac{n(1-p)^{n}}{(n-1)(1-p)^{n-1}}\)
+
+and using the ratio test for this series:
+
+\(\lim_{n \rightarrow \infty} \frac{|n(1-p)^{n}|}{|(n-1)(1-p)^{n-1}|} = \lim_{n \rightarrow \infty} \frac{|n|}{|n-1|} (1-p) = 1-p < 1\)
+
+Therefore our series converges for all \(p \neq 0\).
 
 State 0 is positive recurrent and so are all the rest of the states in
 the MC.
@@ -553,8 +580,8 @@ We simulate \(n=30\) steps to test the function with initial value
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{sim}\NormalTok{(}\DecValTok{100}\NormalTok{,}\DecValTok{30}\NormalTok{,}\FloatTok{0.95}\NormalTok{)}
-\CommentTok{#>  [1] 100   0   1   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15}
-\CommentTok{#> [20]  16  17  18  19  20  21  22  23  24  25  26}
+\CommentTok{#>  [1] 100   0   1   2   3   4   5   0   1   2   3   4   5   6   7   8   9  10  11}
+\CommentTok{#> [20]  12  13  14  15  16  17  18  19  20  21  22}
 \end{Highlighting}
 \end{Shaded}
 
@@ -603,7 +630,7 @@ Our maximums per simulation are always the initial value:
 \NormalTok{    maximums[i] =}\StringTok{ }\KeywordTok{max}\NormalTok{(trajs[,i])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{#> [1] 197 470 410 852 450 394 189 990}
+\CommentTok{#> [1] 856 417 932 651 717 883 811 550}
 \end{Highlighting}
 \end{Shaded}
 
@@ -616,7 +643,7 @@ While the second highest values will be the followings:
 \NormalTok{    maximums[i] =}\StringTok{ }\KeywordTok{max}\NormalTok{(trajs[,i][}\DecValTok{2}\OperatorTok{:}\DecValTok{1000}\NormalTok{])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{#> [1] 12  9  9  9 11  9  6 11}
+\CommentTok{#> [1] 10 10  8  9  9 10  9 10}
 \end{Highlighting}
 \end{Shaded}
 
