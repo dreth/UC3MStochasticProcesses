@@ -580,8 +580,8 @@ We simulate \(n=30\) steps to test the function with initial value
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{sim}\NormalTok{(}\DecValTok{100}\NormalTok{,}\DecValTok{30}\NormalTok{,}\FloatTok{0.95}\NormalTok{)}
-\CommentTok{#>  [1] 100   0   1   2   3   4   5   0   1   2   3   4   5   6   7   8   9  10  11}
-\CommentTok{#> [20]  12  13  14  15  16  17  18  19  20  21  22}
+\CommentTok{#>  [1] 100   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17}
+\CommentTok{#> [20]  18  19  20  21  22  23  24  25  26  27  28}
 \end{Highlighting}
 \end{Shaded}
 
@@ -630,7 +630,7 @@ Our maximums per simulation are always the initial value:
 \NormalTok{    maximums[i] =}\StringTok{ }\KeywordTok{max}\NormalTok{(trajs[,i])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{#> [1] 856 417 932 651 717 883 811 550}
+\CommentTok{#> [1] 484 607 823 466 958 634 112 435}
 \end{Highlighting}
 \end{Shaded}
 
@@ -643,7 +643,7 @@ While the second highest values will be the followings:
 \NormalTok{    maximums[i] =}\StringTok{ }\KeywordTok{max}\NormalTok{(trajs[,i][}\DecValTok{2}\OperatorTok{:}\DecValTok{1000}\NormalTok{])}
 \NormalTok{\}}
 \NormalTok{maximums}
-\CommentTok{#> [1] 10 10  8  9  9 10  9 10}
+\CommentTok{#> [1]  8 10  8  8  9 13 10 12}
 \end{Highlighting}
 \end{Shaded}
 
