@@ -1,32 +1,23 @@
-x_0 <- 0 # initial value
-x <- c(x_0) # vector x
-a <- 1 # limit of a for uniform dist
-mean_x <- c() # mean of x to plot convergence
-sd_x <- c() # sd of x to plot convergence
+# exercise 3a
+library(ggplot2)
 
-# f(y)q(x|y) / f(x)q(y|x)
-f_q <- function(y,x,a) {
-    return(exp((x^2 - y^2)/2))
-}
-
-for (i in 1:1e4) {
-    prev_x <- x[i] # previous value
-    yn <- runif(1, min=prev_x - a, max=prev_x + a) # yn
-    rho <- min(f_q(yn,prev_x, a),1) # rho function
-    u <- runif(1) # random number between 0 and 1
-
-    # return x_n, next value
-    if (u < rho) {
-        x[i+1] <- yn
-    } else {
-        x[i+1] <- prev_x
+ar_1 <- function(theta, sigma_sq, x_n_1, len) {
+    sim_values <- rep(0,len+1)
+    sim_values[1] <- x_n_1
+    for (i in 1:len) {
+        sim_values[i+1] <- theta*sim_values[i] + rnorm(1,0,sigma_sq)
     }
-    
-    # adding elements to plot convergence
-    mean_x[i] <- mean(x)
-    sd_x[i] <- sd(x)
+    return(sim_values)
 }
 
-hist(x)
-plot(mean_x)
-plot(sd_x)
+runs <- 1000
+theta <- seq(-1,1,(1-0)/runs)
+results <- rep(0, length(theta))
+for (i in 1:length(results)) {
+    results[i] <- mean(ar_1(theta[i],1,100,10000))
+}
+results <- data.frame(results)
+results$theta <- theta
+png('./UC3MStochasticProcesses/Lecture 3/results.png',height=1000, width=1000)
+ggplot(results, aes(x=theta, y=result))
+dev.off()

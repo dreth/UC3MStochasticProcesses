@@ -15,7 +15,7 @@ P <- c(0.05, 0.25, 0.25, 0.3, 0.15,
         0.2, 0.25,  0.3, 0.1, 0.15)
 P <- matrix(P,nrow=5,byrow=T)
 
-dist <- matrixpower(P, 150)
+dist <- matrixpower(P, 200)
 
 result <- mean(matrix(c(5,6,6,4,4), nrow=1, byrow=T)%*%dist)
 result
