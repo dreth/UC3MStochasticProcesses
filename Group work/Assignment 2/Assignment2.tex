@@ -1,0 +1,146 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={Stochastic Processes: Assignment 1},
+            pdfauthor={Group 1: Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu Zhang, Daniel Alonso},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Stochastic Processes: Assignment 1}
+\author{Group 1: Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu
+Zhang, Daniel Alonso}
+\date{November 27th, 2020}
+
+\begin{document}
+\maketitle
+
+Importing libraries
+
+\begin{verbatim}
+#> Package:  markovchain
+#> Version:  0.8.5-2
+#> Date:     2020-09-07
+#> BugReport: https://github.com/spedygiorgio/markovchain/issues
+\end{verbatim}
+
+\hypertarget{problem-1}{%
+\section{Problem 1}\label{problem-1}}
+
+\hypertarget{problem-2}{%
+\section{Problem 2}\label{problem-2}}
+
+\hypertarget{a}{%
+\section{(a)}\label{a}}
+
+Let \textbf{\(N(t)\)} be the number of cars arriving at a parking lot by
+time \textbf{\(t\)}, according to the proposed scenario, we can model
+\textbf{\(N(t)\)} as a non-homogenous Poisson process. Such process has
+almost the same process as any other Poisson process, however, its rate
+is a function of time.
+
+\(N(t), t \in [0, \infty)\) is the non-homogenous Poisson process with
+rate \(\lambda (t)\) where:
+
+\begin{itemize}
+\tightlist
+\item
+  \(N(0) = 0\)
+\item
+  \(N(t)\) has independent increments
+\end{itemize}
+
+We define 8:00 as \(t=0\) with the following integrable function and
+each unit of \(t\) equals to 1 hour:
+
+\(\lambda (t) = \begin{cases} 100 & 0 \leq t \leq \frac{1}{2} \\ 600t - 200 & \frac{1}{2} \leq t \leq \frac{3}{4} \\ 400t - 50 & \frac{3}{4} \leq t \leq 1 \\ -500t + 850 & 1 \leq t \leq 1.5 \\ \end{cases}\)
+
+So,
+
+\(E[N(t)] = \begin{cases} \end{cases}\)
+
+\textbf{lots of latex here}
+
+\hypertarget{b}{%
+\section{(b)}\label{b}}
+
+\begin{verbatim}
+#> Call:
+#> testnslv(x = 0, fn = f)
+#> 
+#> Results:
+#>     Method Global termcd Fcnt Jcnt Iter Message     Fnorm
+#> 1   Newton  cline      1    6    6    6   Fcrit 1.541e-31
+#> 2   Newton  qline      1    6    6    6   Fcrit 1.541e-31
+#> 3   Newton  gline      1    6    6    6   Fcrit 1.541e-31
+#> 4   Newton pwldog      1    6    6    6   Fcrit 1.541e-31
+#> 5   Newton dbldog      1    6    6    6   Fcrit 1.541e-31
+#> 6   Newton   hook      1    6    6    6   Fcrit 1.541e-31
+#> 7   Newton   none      1    6    6    6   Fcrit 1.541e-31
+#> 8  Broyden  cline      1    7    1    7   Fcrit 2.392e-17
+#> 9  Broyden  qline      1    7    1    7   Fcrit 2.392e-17
+#> 10 Broyden  gline      1    7    1    7   Fcrit 2.392e-17
+#> 11 Broyden pwldog      1    7    1    7   Fcrit 2.392e-17
+#> 12 Broyden dbldog      1    7    1    7   Fcrit 2.392e-17
+#> 13 Broyden   hook      1    7    1    7   Fcrit 2.392e-17
+#> 14 Broyden   none      1    7    1    7   Fcrit 2.392e-17
+\end{verbatim}
+
+\end{document}

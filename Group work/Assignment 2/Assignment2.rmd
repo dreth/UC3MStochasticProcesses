@@ -1,0 +1,70 @@
+---
+title: 'Stochastic Processes: Assignment 1'
+author: "Group 1: Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu Zhang, Daniel Alonso"
+date: "November 27th, 2020"
+output: 'pdf_document'
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "./figures/"
+)
+```
+
+Importing libraries
+
+```{r, echo=FALSE, warning=FALSE, results='hide'}
+library(markovchain)
+library(matlib)
+library(nleqslv)
+library(rootSolve)
+```
+
+# Problem 1
+
+
+# Problem 2
+
+# (a)
+
+Let **$N(t)$** be the number of cars arriving at a parking lot by time **$t$**, according to the proposed scenario, we can model **$N(t)$** as a non-homogenous Poisson process. Such process has almost the same process as any other Poisson process, however, its rate is a function of time.
+
+$N(t), t \in [0, \infty)$ is the non-homogenous Poisson process with rate $\lambda (t)$ where:
+
+- $N(0) = 0$
+- $N(t)$ has independent increments
+
+We define 8:00 as $t=0$ with the following integrable function and each unit of $t$ equals to 1 hour:
+
+$\lambda (t) = \begin{cases} 100 & 0 \leq t \leq \frac{1}{2} \\
+600t - 200 & \frac{1}{2} \leq t \leq \frac{3}{4} \\
+400t - 50 & \frac{3}{4} \leq t \leq 1 \\
+-500t + 850 & 1 \leq t \leq 1.5 \\
+\end{cases}$
+
+So,
+
+$E[N(t)] = \begin{cases} \end{cases}$
+
+**lots of latex here**
+
+# (b)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+f <- function(l) {
+    sum((exp(-l) * l^k)/(factorial(k))) - 1
+}
+k <- 0:150
+nleqslv(0,f)
+```
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+test <- 0
+for (i in 1:149) {
+    test <- test + (exp(-1.609438) * 1.609438^i)/(factorial(i))
+}
+test
+```
