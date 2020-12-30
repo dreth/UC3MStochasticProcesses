@@ -55,7 +55,7 @@ $E[N(t)] = \begin{cases} \end{cases}$
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 f <- function(l) {
-    sum((exp(-l) * l^k)/(factorial(k))) - 1
+    sum((exp(-l) * l^k)/(factorial(k))) - 0.8
 }
 k <- 0:150
 nleqslv(0,f)
@@ -67,4 +67,41 @@ for (i in 1:149) {
     test <- test + (exp(-1.609438) * 1.609438^i)/(factorial(i))
 }
 test
+```
+
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+f <- function(l) {
+    1 - sum((exp(-l) * l^k)/(factorial(k))) - 0.8
+}
+
+tt = c()
+aa = seq(0,100,0.1)
+for (i in seq(0,100,0.1)) {
+    tt = c(tt, f(i))
+}
+test <- data.frame(val=aa, tt=tt)
+
+```
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+tt = c()
+aa = seq(0,200,1)
+for (i in aa) {
+    tt = c(tt, ppois(149,lambda=i))
+}
+test <- data.frame(val=aa, tt=tt)
+write.csv(test, 'test.csv')
+```
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+tt = c()
+aa = seq(0,140,1)
+bb = seq(0, 30,1)
+for (i in bb) {
+    for (j in aa) {
+        tt = c(tt, ppois(149,lambda=i))
+    }
+}
+test <- data.frame(val=aa, tt=tt)
+write.csv(test, 'test.csv')
 ```
