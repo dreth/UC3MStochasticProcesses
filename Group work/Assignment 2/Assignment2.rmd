@@ -26,13 +26,16 @@ library(stringi)
 # Problem 1
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-freq <- read.table('./data/Englishcharacters.txt') + 1
+freq <- read.table('./data/Englishcharacters.txt')
+freq <- log(freq + 2)
+#scaling freq
+freq <- ((freq - min(freq))/(max(freq) - min(freq))) + 1
 message <- paste(readLines("./data/messages.txt"))[1]
 
 # decode function
 decode <- function(message, freqs, iters) {
     # message separated by "" to iterate
-    message <- strsplit(message, "")[[1]]
+    msg <- strsplit(message, "")[[1]]
 
     # identity function
     fvals <- 1:27
@@ -49,9 +52,9 @@ decode <- function(message, freqs, iters) {
     # score function
     score <- function(fun) {
         p <- 1
-        for (i in 2:length(message)) {
-            p <- p * freq[fun(message[i-1]),fun(message[i])]
-        }
+        for (i in 2:length(msg)) {
+            p <- p * freq[fun(msg[i-1]),fun(msg[i])]
+        } 
         return(p)
     }
 
@@ -69,30 +72,24 @@ decode <- function(message, freqs, iters) {
 
         # f asterisk
         f_n <- function(c) return(fvals_n[c])
-
-        scr <- (score(f_n)/score(f))
-        print(scr)
-        cond <- runif(1) <= scr
+        scr <- score(f_n)/score(f)
         rnd <- runif(1)
-        if (is.na(cond) == TRUE) {
-            for (l in 1:length(message)) {
-                message[l] <- names(f(message[l]))
-            }
-        } else if (rnd >= scr){
-            for (l in 1:length(message)) {
-                message[l] <- names(f(message[l]))
-            }
-        } else if (rnd <= scr){
-            f <- f_n
+        cond <- rnd <= scr
+        if (cond == TRUE){
             letters <- letters_n
             names(fvals) <- letters
-            for (l in 1:length(message)) {
-                message[l] <- names(f(message[l]))
+            f <- function(c) return(fvals[c])
+            for (l in 1:length(msg)) {
+                msg[l] <- names(f(msg[l]))
             }
-        } 
+        } else if (cond == FALSE){
+            for (l in 1:length(msg)) {
+                msg[l] <- names(f(msg[l]))
+            }
+        }
 
     }
-    return(stri_paste(message,collapse=''))
+    return(stri_paste(msg,collapse=''))
 }
 decode(message,freq,100)
 ```
@@ -126,11 +123,10 @@ $E[N(t)] = \begin{cases} \end{cases}$
 # (b)
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-
 f <- function(l) {
-    sum((exp(-l) * l^k)/(factorial(k))) - 0.8
+    sum((exp(-l) * l^k)/(factorial(k))) - 1
 }
-k <- 0:150
+k <- 0:149
 nleqslv(0,f)
 ```
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -164,6 +160,7 @@ for (i in aa) {
     tt = c(tt, ppois(149,lambda=i))
 }
 test <- data.frame(val=aa, tt=tt)
+test
 write.csv(test, 'test.csv')
 ```
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
@@ -176,5 +173,15 @@ for (i in bb) {
     }
 }
 test <- data.frame(val=aa, tt=tt)
+test
 write.csv(test, 'test.csv')
+```
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+test <- 0
+for (i in 0:143) {
+    test <- test + (exp(-140) * 140^i)/(factorial(i))
+    print((exp(-140) * 140^i)/(factorial(i)))
+}
+test
 ```
