@@ -23,11 +23,16 @@ library(rootSolve)
 library(stringi)
 library(randomcoloR)
 library(dplyr)
+library(reticulate)
+```
+
+```{r setup, include=FALSE}
+use_python('/home/dreth/anaconda3/bin/python')
 ```
 
 # Problem 1
 
-```{python}
+```{python, eval=FALSE}
 import numpy as np
 from copy import deepcopy
 import pandas as pd
@@ -98,7 +103,7 @@ def decode(message, freqs, iters):
 
         cd_n = {l:v for l,v in zip(init_letters,letters_n)}
         cd_n.update({' ':' '})
-        
+
         # f asterisk
         def f_n(c):
             return cd_n[c]
@@ -388,26 +393,6 @@ for (i in 1:length(data)) {
 ratio/1000
 ```
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-tt = c()
-aa = seq(0,140,1)
-bb = seq(0, 30,1)
-for (i in bb) {
-    for (j in aa) {
-        tt = c(tt, ppois(149,lambda=i))
-    }
-}
-test <- data.frame(val=aa, tt=tt)
-write.csv(test, 'test.csv')
-```
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-test <- 0
-for (i in 0:143) {
-    test <- test + (exp(-140) * 140^i)/(factorial(i))
-}
-```
-
 # Problem 3
 
 # (a)
@@ -548,16 +533,61 @@ $P(N^{OV} = k) = \frac{\lambda}{2 \mu + \lambda}$, $k = c-1 = 1$
 We define the following function to simulate the queueing system:
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE, eval=FALSE}
-q <- function(n, l, m) {
-    s = cumsum(rexp(n, l))
-    t = rexp(n, m)
-
-    exit_time = numeric(n)
-    exit_time[1:2] = t[1:2]
-    for (i in 3:n) {
-        s_t <- sort(exit_time[1:(i-1)], decreasing = TRUE)
-
-        if (s[i])
+q <- function(customers, l, m) {
+    exp_at <- rexp(customers,l)
+    ArrivalTimes <- rep(0,customers)
+    ArrivalTimes[1] <- exp_at[1]
+    for (i in 2:customers) {
+        ArrivalTimes[i] <- ArrivalTimes[i-1] + exp_at[i]
+    } 
+    ServiceTimes <- rexp(customers, m)
+    ExitTimes <- rep(0,customers)
+    ExitTimes[1:2] <- ServiceTimes[1:2]
+    for (i in 3:customers) {
+        SortedTimes <- sort(ExitTimes[1:(i-1)], decreasing=T)
+        if (ArrivalTimes[i] < SortedTimes[2]) {ExitTimes[i] <- SortedTimes[2] + ServiceTimes[i]}
+         else {ExitTimes[i] <- ArrivalTimes[i] + ServiceTimes[i]}
     }
+    times <- data.frame(arrival=ArrivalTimes,
+                        exit=ExitTimes,
+                        service=ServiceTimes)
+    return(times)
 }
+```
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+number_of_customers <- 8500
+times <- q(number_of_customers, l=0.4, m=0.25) 
+plot(times$exit)
+```
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+last_arrival_time <- times$arrival[length(times$arrival)]
+sum(times$exit > last_arrival_time)
+```
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+nb.pe=numeric(length=length(t))
+for (i in 1:length(times$service)){
+  nb.pe[i]=length(which(times$arrival<times$service[i]&times$exit>times$service[i]))
+}
+```
+
+# (e)
+
+We define the following function to calculate the overtaking probability:
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+d <- function(customers, ot_prob, queue, ExitTimes) {
+    for (i in queue:(customers - queue)) {
+        ot_prob <- ot_prob + sum(ExitTimes[i] < ExitTimes[1:(i-1)])
+    }
+    r <- customers-2*queue
+    ot_prob <- ot_prob/r
+    return(ot_prob)
+}
+```
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+
 ```

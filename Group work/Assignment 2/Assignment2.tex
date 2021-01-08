@@ -117,6 +117,115 @@ Importing libraries
 \hypertarget{problem-1}{%
 \section{Problem 1}\label{problem-1}}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ numpy }\ImportTok{as}\NormalTok{ np}
+\ImportTok{from}\NormalTok{ copy }\ImportTok{import}\NormalTok{ deepcopy}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+\ImportTok{from}\NormalTok{ nltk.corpus }\ImportTok{import}\NormalTok{ words}
+\ImportTok{import}\NormalTok{ matplotlib.pyplot }\ImportTok{as}\NormalTok{ plt}
+\ImportTok{import}\NormalTok{ threading }\ImportTok{as}\NormalTok{ th}
+
+\NormalTok{freq }\OperatorTok{=}\NormalTok{  np.loadtxt(}\StringTok{'./data/Englishcharacters.txt'}\NormalTok{, usecols}\OperatorTok{=}\BuiltInTok{range}\NormalTok{(}\DecValTok{27}\NormalTok{))}
+
+\KeywordTok{def}\NormalTok{ transf_minmax(table,a,b):}
+    \ControlFlowTok{return}\NormalTok{ (b}\OperatorTok{-}\NormalTok{a)}\OperatorTok{*}\NormalTok{((table }\OperatorTok{-}\NormalTok{ np.}\BuiltInTok{min}\NormalTok{(table))}\OperatorTok{/}\NormalTok{(np.}\BuiltInTok{max}\NormalTok{(table) }\OperatorTok{-}\NormalTok{ np.}\BuiltInTok{min}\NormalTok{(table))) }\OperatorTok{+}\NormalTok{ a }
+
+\KeywordTok{def}\NormalTok{ transf_log(table):}
+    \ControlFlowTok{return}\NormalTok{ np.log(table }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{freq }\OperatorTok{=}\NormalTok{ transf_log(freq)}
+
+\ControlFlowTok{with} \BuiltInTok{open}\NormalTok{(}\StringTok{'./data/messages.txt'}\NormalTok{) }\ImportTok{as}\NormalTok{ f:}
+\NormalTok{    message }\OperatorTok{=}\NormalTok{ f.readlines()[}\DecValTok{9}\NormalTok{].replace(}\StringTok{'}\CharTok{\textbackslash{}n}\StringTok{'}\NormalTok{,}\StringTok{''}\NormalTok{)}
+
+\KeywordTok{def}\NormalTok{ decode(message, freqs, iters):}
+    \CommentTok{# messages per iteration}
+\NormalTok{    msg_iters }\OperatorTok{=}\NormalTok{ \{\}}
+    \CommentTok{# identity function}
+\NormalTok{    letters }\OperatorTok{=}\NormalTok{ [}\StringTok{"a"}\NormalTok{, }\StringTok{"b"}\NormalTok{, }\StringTok{"c"}\NormalTok{, }\StringTok{"d"}\NormalTok{,}
+                \StringTok{"e"}\NormalTok{, }\StringTok{"f"}\NormalTok{, }\StringTok{"g"}\NormalTok{, }\StringTok{"h"}\NormalTok{, }
+                \StringTok{"i"}\NormalTok{, }\StringTok{"j"}\NormalTok{, }\StringTok{"k"}\NormalTok{, }\StringTok{"l"}\NormalTok{, }
+                \StringTok{"m"}\NormalTok{, }\StringTok{"n"}\NormalTok{, }\StringTok{"o"}\NormalTok{, }\StringTok{"p"}\NormalTok{, }
+                \StringTok{"q"}\NormalTok{, }\StringTok{"r"}\NormalTok{, }\StringTok{"s"}\NormalTok{, }\StringTok{"t"}\NormalTok{, }
+                \StringTok{"u"}\NormalTok{, }\StringTok{"v"}\NormalTok{, }\StringTok{"w"}\NormalTok{, }\StringTok{"x"}\NormalTok{, }
+                \StringTok{"y"}\NormalTok{, }\StringTok{"z"}\NormalTok{]}
+\NormalTok{    init_letters }\OperatorTok{=}\NormalTok{ deepcopy(letters)}
+\NormalTok{    cd }\OperatorTok{=}\NormalTok{ \{l:l }\ControlFlowTok{for}\NormalTok{ l,l }\KeywordTok{in} \BuiltInTok{zip}\NormalTok{(init_letters,letters)\}}
+\NormalTok{    cd.update(\{}\StringTok{' '}\NormalTok{:}\StringTok{' '}\NormalTok{\})}
+    \KeywordTok{def}\NormalTok{ f(c):}
+        \ControlFlowTok{return}\NormalTok{ cd[c]}
+    
+    \CommentTok{# mapping letters to cols}
+\NormalTok{    fvals }\OperatorTok{=}\NormalTok{ np.array([x }\ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(letters))])}
+\NormalTok{    cd_map }\OperatorTok{=}\NormalTok{ \{l:v }\ControlFlowTok{for}\NormalTok{ l,v }\KeywordTok{in} \BuiltInTok{zip}\NormalTok{(letters,fvals)\}}
+\NormalTok{    cd_map.update(\{}\StringTok{' '}\NormalTok{:}\DecValTok{26}\NormalTok{\})}
+    \KeywordTok{def}\NormalTok{ f_map(c):}
+        \ControlFlowTok{return}\NormalTok{ cd_map[c]}
+
+    \CommentTok{# score function}
+    \KeywordTok{def}\NormalTok{ score(fun):}
+\NormalTok{        p }\OperatorTok{=} \DecValTok{0}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{,}\BuiltInTok{len}\NormalTok{(msg)):}
+\NormalTok{            p }\OperatorTok{=}\NormalTok{ p }\OperatorTok{+}\NormalTok{ freq[f_map(fun(msg[i}\DecValTok{-1}\NormalTok{])),f_map(fun(msg[i]))]}
+        \ControlFlowTok{return}\NormalTok{ p}
+    
+    \CommentTok{# msg to list}
+\NormalTok{    msg }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(message)}
+
+    \CommentTok{# letters to modify the cipher}
+\NormalTok{    letters_n }\OperatorTok{=}\NormalTok{ deepcopy(letters)}
+
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(iters):}
+
+        \CommentTok{# randomly choose 2 numbers and replace the 2 chosen }
+        \CommentTok{# vals in a copy of letters}
+\NormalTok{        ch1 }\OperatorTok{=}\NormalTok{ np.random.randint(}\DecValTok{1}\NormalTok{,}\BuiltInTok{len}\NormalTok{(letters))}
+\NormalTok{        ch2 }\OperatorTok{=}\NormalTok{ np.random.randint(}\DecValTok{1}\NormalTok{,}\BuiltInTok{len}\NormalTok{(letters))}
+\NormalTok{        plc1 }\OperatorTok{=}\NormalTok{ deepcopy(letters_n[ch1])}
+\NormalTok{        plc2 }\OperatorTok{=}\NormalTok{ deepcopy(letters_n[ch2])}
+\NormalTok{        letters_n[ch1] }\OperatorTok{=}\NormalTok{ plc2}
+\NormalTok{        letters_n[ch2] }\OperatorTok{=}\NormalTok{ plc1}
+
+\NormalTok{        cd_n }\OperatorTok{=}\NormalTok{ \{l:v }\ControlFlowTok{for}\NormalTok{ l,v }\KeywordTok{in} \BuiltInTok{zip}\NormalTok{(init_letters,letters_n)\}}
+\NormalTok{        cd_n.update(\{}\StringTok{' '}\NormalTok{:}\StringTok{' '}\NormalTok{\})}
+
+        \CommentTok{# f asterisk}
+        \KeywordTok{def}\NormalTok{ f_n(c):}
+            \ControlFlowTok{return}\NormalTok{ cd_n[c]}
+
+        \CommentTok{#loop with scores}
+\NormalTok{        scr_f }\OperatorTok{=}\NormalTok{ score(f)}
+\NormalTok{        scr_fn }\OperatorTok{=}\NormalTok{ score(f_n)}
+\NormalTok{        scr }\OperatorTok{=}\NormalTok{ scr_fn}\OperatorTok{/}\NormalTok{scr_f}
+
+        \CommentTok{# print(f'score f*: \{scr_fn\}, score f: \{scr_f\}, ratio: \{scr\}')}
+\NormalTok{        cond }\OperatorTok{=}\NormalTok{ np.random.rand() }\OperatorTok{<=}\NormalTok{ scr}
+
+        \ControlFlowTok{if}\NormalTok{ cond:}
+\NormalTok{            letters }\OperatorTok{=}\NormalTok{ deepcopy(letters_n)}
+\NormalTok{            cd }\OperatorTok{=}\NormalTok{ \{l:v }\ControlFlowTok{for}\NormalTok{ l,v }\KeywordTok{in} \BuiltInTok{zip}\NormalTok{(init_letters,letters)\}}
+\NormalTok{            cd.update(\{}\StringTok{' '}\NormalTok{:}\StringTok{' '}\NormalTok{\})}
+            \ControlFlowTok{for}\NormalTok{ k }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(msg)):}
+\NormalTok{                msg[k] }\OperatorTok{=}\NormalTok{ f(msg[k])}
+\NormalTok{            msg_iters[i] }\OperatorTok{=}\NormalTok{ (scr,}\StringTok{''}\NormalTok{.join([x }\ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ msg]))}
+        \ControlFlowTok{else}\NormalTok{:}
+            \ControlFlowTok{for}\NormalTok{ k }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(msg)):}
+\NormalTok{                msg[k] }\OperatorTok{=}\NormalTok{ f(msg[k])}
+\NormalTok{        msg }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(message)}
+    
+    \CommentTok{# put in a dataframe}
+\NormalTok{    df }\OperatorTok{=}\NormalTok{ \{}\StringTok{'iter'}\NormalTok{:[it }\ControlFlowTok{for}\NormalTok{ it }\KeywordTok{in}\NormalTok{ msg_iters.keys()],}
+          \StringTok{'score'}\NormalTok{:[msg[}\DecValTok{0}\NormalTok{] }\ControlFlowTok{for}\NormalTok{ msg }\KeywordTok{in}\NormalTok{ msg_iters.values()],}
+          \StringTok{'msg'}\NormalTok{:[msg[}\DecValTok{1}\NormalTok{] }\ControlFlowTok{for}\NormalTok{ msg }\KeywordTok{in}\NormalTok{ msg_iters.values()]\}}
+    \ControlFlowTok{return}\NormalTok{ pd.DataFrame(df)}
+
+\NormalTok{result }\OperatorTok{=}\NormalTok{ decode(message,freq, }\DecValTok{50000}\NormalTok{)}
+\NormalTok{plt.plot(result.sort_values(}\StringTok{'score'}\NormalTok{)[}\StringTok{'score'}\NormalTok{].reset_index(drop}\OperatorTok{=}\VariableTok{True}\NormalTok{))}
+\BuiltInTok{print}\NormalTok{(result[result[}\StringTok{'score'}\NormalTok{] }\OperatorTok{==} \BuiltInTok{max}\NormalTok{(result[}\StringTok{'score'}\NormalTok{])])}
+\end{Highlighting}
+\end{Shaded}
+
 \begin{verbatim}
 #> [1] "n bnq ndrsw awornoc aslnxs rzs dowfr ksfrswc ljicrwq rj nirzjwoms n ljwjcngowif gnllocs aworofz ncb nxswolnc jddolonhf aolpswsb jgsw kzolz tjgswcxscrf bwit nyywjgnh ywjlsff knf asrrsw hsnboct floscrofrf rj knwc rznr rzs bsanrs ljihb icbswxocs yiahol dnorz gnllocs cnrojcnhofx znf cj yhnls oc ljgob jw jrzsw yiahol zsnhrz xnrrswf jd thjanh fotcodolncls fnob n floscrodol nbgofsw rj rzs aworofz tjgswcxscr floscls znf nhknqf assc rzs suor frwnrstq dwjx rzof zjwwscbjif yncbsxol fsgswnh rjy aworofz hnkxnpswf zngs nhfj ocljwwslrhq lnfr rzs ljicrwqf fyhor korz rzs siwjysnc icojc nf rzs wsnfjc or nirzjwomsb n gnllocs dowfr oc dnlr awornoc wsxnocf icbsw rzs ahjlf wstihnrjwq ixawshhn ncb knf nahs rj xjgs xjws violphq aslnifs jd nc jhb hnk scnahoct or rj xnps orf jkc bsrswxocnrojcf oc yiahol zsnhrz sxswtsclosf"
 \end{verbatim}
@@ -160,8 +269,8 @@ Given that there is a limit of 150 vehicles:
 \hypertarget{b}{%
 \section{(b)}\label{b}}
 
-\includegraphics{./figures/unnamed-chunk-4-1.pdf}
-\includegraphics{./figures/unnamed-chunk-4-2.pdf}
+\includegraphics{./figures/unnamed-chunk-5-1.pdf}
+\includegraphics{./figures/unnamed-chunk-5-2.pdf}
 
 Luego de hacer las pruebas para \(\lambda (t)\) obtenemos lo siguiente:
 
@@ -265,7 +374,7 @@ homogenous poisson process:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{./figures/unnamed-chunk-9-1.pdf}
+\includegraphics{./figures/unnamed-chunk-10-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -278,7 +387,7 @@ homogenous poisson process:
 \NormalTok{    \}}
 \NormalTok{\}}
 \NormalTok{ratio}\OperatorTok{/}\DecValTok{1000}
-\CommentTok{#> [1] 0.2}
+\CommentTok{#> [1] 0.204}
 \end{Highlighting}
 \end{Shaded}
 
@@ -421,5 +530,54 @@ Then:
 So then we get:
 
 \(P(N^{OV} = k) = \frac{\lambda}{2 \mu + \lambda}\), \(k = c-1 = 1\)
+
+\hypertarget{d}{%
+\section{(d)}\label{d}}
+
+We define the following function to simulate the queueing system:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{q <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(customers, l, m) \{}
+\NormalTok{    exp_at <-}\StringTok{ }\KeywordTok{rexp}\NormalTok{(n,l)}
+\NormalTok{    ArrivalTimes <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,n)}
+\NormalTok{    ArrivalTimes[}\DecValTok{1}\NormalTok{] <-}\StringTok{ }\NormalTok{exp_at[}\DecValTok{1}\NormalTok{]}
+    \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{2}\OperatorTok{:}\NormalTok{customers) \{}
+\NormalTok{        ArrivalTimes[i] <-}\StringTok{ }\NormalTok{ArrivalTimes[i}\DecValTok{-1}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{exp_at[i]}
+\NormalTok{    \} }
+\NormalTok{    ServiceTimes <-}\StringTok{ }\KeywordTok{rexp}\NormalTok{(customers, m)}
+\NormalTok{    ExitTimes <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,customers)}
+\NormalTok{    ExitTimes[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{] <-}\StringTok{ }\NormalTok{ServiceTimes[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{]}
+    \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{3}\OperatorTok{:}\NormalTok{customers) \{}
+\NormalTok{        SortedTimes <-}\StringTok{ }\KeywordTok{sort}\NormalTok{(ExitTimes[}\DecValTok{1}\OperatorTok{:}\NormalTok{(i}\DecValTok{-1}\NormalTok{)], }\DataTypeTok{decreasing=}\NormalTok{T)}
+        \ControlFlowTok{if}\NormalTok{ (ArrivalTimes[i] }\OperatorTok{<}\StringTok{ }\NormalTok{SortedTimes[}\DecValTok{2}\NormalTok{]) \{ExitTimes[i] <-}\StringTok{ }\NormalTok{SortedTimes[}\DecValTok{2}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{ServiceTimes[i]\}}
+         \ControlFlowTok{else}\NormalTok{ \{ExitTimes[i] <-}\StringTok{ }\NormalTok{ArrivalTimes[i] }\OperatorTok{+}\StringTok{ }\NormalTok{ServiceTimes[i]\}}
+\NormalTok{    \}}
+\NormalTok{    times <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{arrival=}\NormalTok{ArrivalTimes,}
+                        \DataTypeTok{exit=}\NormalTok{ExitTimes,}
+                        \DataTypeTok{service=}\NormalTok{ServiceTimes)}
+    \KeywordTok{return}\NormalTok{(times)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{e}{%
+\section{(e)}\label{e}}
+
+We define the following function to calculate the overtaking
+probability:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{d <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(customers, ot_prob, queue, ExitTimes) \{}
+    \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in}\NormalTok{ queue}\OperatorTok{:}\NormalTok{(customers }\OperatorTok{-}\StringTok{ }\NormalTok{queue)) \{}
+\NormalTok{        ot_prob <-}\StringTok{ }\NormalTok{ot_prob }\OperatorTok{+}\StringTok{ }\KeywordTok{sum}\NormalTok{(ExitTimes[i] }\OperatorTok{<}\StringTok{ }\NormalTok{ExitTimes[}\DecValTok{1}\OperatorTok{:}\NormalTok{(i}\DecValTok{-1}\NormalTok{)])}
+\NormalTok{    \}}
+\NormalTok{    r <-}\StringTok{ }\NormalTok{customers}\DecValTok{-2}\OperatorTok{*}\NormalTok{queue}
+\NormalTok{    ot_prob <-}\StringTok{ }\NormalTok{ot_prob}\OperatorTok{/}\NormalTok{r}
+    \KeywordTok{return}\NormalTok{(ot_prob)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
 
 \end{document}
