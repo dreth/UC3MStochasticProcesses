@@ -114,21 +114,6 @@ Zhang, Daniel Alonso}
 
 Importing libraries
 
-\begin{verbatim}
-#> Package:  markovchain
-#> Version:  0.8.5-2
-#> Date:     2020-09-07
-#> BugReport: https://github.com/spedygiorgio/markovchain/issues
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-\end{verbatim}
-
 \hypertarget{problem-1}{%
 \section{Problem 1}\label{problem-1}}
 
@@ -188,7 +173,8 @@ Luego de hacer las pruebas para \(\lambda (t)\) obtenemos lo siguiente:
 \end{Highlighting}
 \end{Shaded}
 
-Por lo que \(t = 0.91232\) horas.
+Por lo que \(t = 0.91232\) horas (aproximadamente a las 8:54 de la
+mañana).
 
 \hypertarget{c}{%
 \section{(c)}\label{c}}
@@ -292,7 +278,7 @@ homogenous poisson process:
 \NormalTok{    \}}
 \NormalTok{\}}
 \NormalTok{ratio}\OperatorTok{/}\DecValTok{1000}
-\CommentTok{#> [1] 0.097}
+\CommentTok{#> [1] 0.2}
 \end{Highlighting}
 \end{Shaded}
 
@@ -342,5 +328,98 @@ Then multiplying \(\frac{2}{2}\) to the summation:
 finally:
 
 \(\pi_n = \frac{1}{2^{n-1}} (\frac{\lambda}{\mu})^{n} \pi_0\)
+
+The infinite sum converges when \(|\frac{\lambda}{2 \mu}| < 1\) in which
+case the stationary distribution P exists.
+
+Then:
+
+\(L = \sum_{n=0}^{\infty} \pi_n * n\)
+
+Using the following sum:
+
+\(\sum_{i=0}^{n-1} i a^i = \frac{a - na^n + (n-1)a^{n+1}}{(1-a)^2}\)
+
+As n approaches infinity:
+
+\(\sum_{i=0}^{\infty} i a^i = \frac{a}{(1-a)^2}\)
+
+We get the following:
+
+\(L = \pi_0 [1 + \sum_{n=0}^{infty} (\frac{\lambda}{\mu})^n * \frac{n}{2^{n-1}}]\)
+
+\(L = \pi_0 [1 + 2 \sum_{n=0}^{infty} (\frac{\lambda}{2 \mu})^n * n]\)
+
+\(L = \pi_0 [1 + 2 \frac{\frac{\lambda}{2 \mu}}{(1 - \frac{\lambda}{2 \mu})^2}]\)
+
+\hypertarget{c-1}{%
+\section{(c)}\label{c-1}}
+
+Let's consider the probabilities conditioned on the number of customers
+in the system that are present once our specific subject \emph{l} gets
+into the system.
+
+If there are no other customers when \emph{l} gets into the system,
+there is no chance of overtaking.
+
+\(P(N^{OV} = 0 | N^{PR} = 0) = 1\)
+
+With \(N^{OV}\) being the number of customers that \emph{l} overtakes
+and \(N^{PR}\) the number of customers present in the system (queing)
+when \emph{l} gets in the system.
+
+If \(N^{PR} = 1\), then \emph{l} can overtake only 1 customer, if the
+time it takes to be served is shorter than the time it takes the other
+customers to be served. Because of the memoryless property we can assert
+the following:
+
+\(P(N^{OV} = 0 | N^{PR} = 1) = \frac{\mu}{\mu + \mu} = \frac{1}{2}\)
+
+Actually, in general:
+
+\(P(N^{OV} = k | N^{PR} = n) = \frac{1}{n+1}\), \(n \leq c - 1\),
+\(x = 0,1\)
+
+As in this case c=2, our \emph{l} subject can' t overtake more than one
+customer.
+
+Now, if \(n \geq c\), that is, \emph{l} has to get in queue and wait to
+be served. When \emph{l} gets served, there is also one more customer
+getting served. Because, again, of the memoryless property.
+
+\(P(N^{OV} = k | N^{PR} = n) = \frac{1}{c}\), \(n = c\), \(k = 0,1\)
+
+In our case, it does not matter how many customers are in the system,
+the probability of overtaking, conditioned to the number of customers
+already in the system, is \(\frac{1}{2}\).
+
+Now, using Bayes' theorem and the total probability rule, we can find
+the probability of \emph{l} overtaking another customer.
+
+\(P(A | B) = \frac{P(A \cap B)}{P(B)}\)
+
+\(\frac{1}{2} \sum_{i=1}^{\infty} \pi_i = \frac{1}{2} \sum_{i=1}^{\infty} (\frac{1}{2^{i-1}}) (\frac{\lambda}{\mu})^{i} \pi_0\)
+
+=
+\(\sum_{i=1}^{\infty} (\frac{\lambda}{2 \mu})^i \pi_0 = (\sum_{i=0}^{\infty} ((\frac{\lambda}{2 \mu})^i) - 1) \pi_0\)
+
+=
+\((\frac{1}{1-\frac{\lambda}{2 \mu}} - 1) \pi_0 = \frac{1}{2 (\frac{1}{1 - \frac{\lambda}{2 \mu} - 1})} (\frac{1}{1 - \frac{\lambda}{\mu}} - 1)\)
+
+=
+\(\frac{1}{1 - \frac{\lambda}{2 \mu}} - 1 = \frac{1 - (1 - \frac{\lambda}{2 \mu})}{1 - \frac{\lambda}{2 \mu}} = \frac{\frac{\lambda}{2 \mu}}{1 - \frac{\lambda}{2 \mu}}\)
+
+=
+\(2 (\frac{1}{1 - \frac{\lambda}{2 \mu}}) - 1 = \frac{2}{1 - \frac{\lambda}{2 \mu}} - 1 = \frac{2 - (1 - \frac{\lambda}{2 \mu})}{1 - \frac{\lambda}{2 \mu}}\)
+
+= \(\frac{1 + \frac{\lambda}{2 \mu}}{1 - \frac{\lambda}{2 \mu}}\)
+
+Then:
+
+\(\frac{\frac{\lambda}{2 \mu}}{1 \frac{\lambda}{2 \mu}} = \frac{\frac{\lambda}{2 \mu}}{\frac{2 \mu + \lambda}{2 \mu}} = \frac{\lambda}{2 \mu + \lambda}\)
+
+So then we get:
+
+\(P(N^{OV} = k) = \frac{\lambda}{2 \mu + \lambda}\), \(k = c-1 = 1\)
 
 \end{document}

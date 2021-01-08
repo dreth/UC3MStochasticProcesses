@@ -27,6 +27,113 @@ library(dplyr)
 
 # Problem 1
 
+```{python}
+import numpy as np
+from copy import deepcopy
+import pandas as pd
+from nltk.corpus import words
+import matplotlib.pyplot as plt
+import threading as th
+
+freq =  np.loadtxt('./data/Englishcharacters.txt', usecols=range(27))
+
+def transf_minmax(table,a,b):
+    return (b-a)*((table - np.min(table))/(np.max(table) - np.min(table))) + a 
+
+def transf_log(table):
+    return np.log(table + 1)
+
+freq = transf_log(freq)
+
+with open('./data/messages.txt') as f:
+    message = f.readlines()[9].replace('\n','')
+
+def decode(message, freqs, iters):
+    # messages per iteration
+    msg_iters = {}
+    # identity function
+    letters = ["a", "b", "c", "d",
+                "e", "f", "g", "h", 
+                "i", "j", "k", "l", 
+                "m", "n", "o", "p", 
+                "q", "r", "s", "t", 
+                "u", "v", "w", "x", 
+                "y", "z"]
+    init_letters = deepcopy(letters)
+    cd = {l:l for l,l in zip(init_letters,letters)}
+    cd.update({' ':' '})
+    def f(c):
+        return cd[c]
+    
+    # mapping letters to cols
+    fvals = np.array([x for x in range(len(letters))])
+    cd_map = {l:v for l,v in zip(letters,fvals)}
+    cd_map.update({' ':26})
+    def f_map(c):
+        return cd_map[c]
+
+    # score function
+    def score(fun):
+        p = 0
+        for i in range(1,len(msg)):
+            p = p + freq[f_map(fun(msg[i-1])),f_map(fun(msg[i]))]
+        return p
+    
+    # msg to list
+    msg = list(message)
+
+    # letters to modify the cipher
+    letters_n = deepcopy(letters)
+
+    for i in range(iters):
+
+        # randomly choose 2 numbers and replace the 2 chosen 
+        # vals in a copy of letters
+        ch1 = np.random.randint(1,len(letters))
+        ch2 = np.random.randint(1,len(letters))
+        plc1 = deepcopy(letters_n[ch1])
+        plc2 = deepcopy(letters_n[ch2])
+        letters_n[ch1] = plc2
+        letters_n[ch2] = plc1
+
+        cd_n = {l:v for l,v in zip(init_letters,letters_n)}
+        cd_n.update({' ':' '})
+        
+        # f asterisk
+        def f_n(c):
+            return cd_n[c]
+
+        #loop with scores
+        scr_f = score(f)
+        scr_fn = score(f_n)
+        scr = scr_fn/scr_f
+
+        # print(f'score f*: {scr_fn}, score f: {scr_f}, ratio: {scr}')
+        cond = np.random.rand() <= scr
+
+        if cond:
+            letters = deepcopy(letters_n)
+            cd = {l:v for l,v in zip(init_letters,letters)}
+            cd.update({' ':' '})
+            for k in range(len(msg)):
+                msg[k] = f(msg[k])
+            msg_iters[i] = (scr,''.join([x for x in msg]))
+        else:
+            for k in range(len(msg)):
+                msg[k] = f(msg[k])
+        msg = list(message)
+    
+    # put in a dataframe
+    df = {'iter':[it for it in msg_iters.keys()],
+          'score':[msg[0] for msg in msg_iters.values()],
+          'msg':[msg[1] for msg in msg_iters.values()]}
+    return pd.DataFrame(df)
+
+result = decode(message,freq, 50000)
+plt.plot(result.sort_values('score')['score'].reset_index(drop=True))
+print(result[result['score'] == max(result['score'])])
+```
+
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 freq <- read.table('./data/Englishcharacters.txt')
 freq <- log(freq + 2)
@@ -384,3 +491,73 @@ $L = \pi_0 [1 + 2 \sum_{n=0}^{infty} (\frac{\lambda}{2 \mu})^n * n]$
 
 $L = \pi_0 [1 + 2 \frac{\frac{\lambda}{2 \mu}}{(1 - \frac{\lambda}{2 \mu})^2}]$
 
+# (c)
+
+Let's consider the probabilities conditioned on the number of customers in the system that are present once our specific subject *l* gets into the system.
+
+If there are no other customers when *l* gets into the system, there is no chance of overtaking.
+
+$P(N^{OV} = 0 | N^{PR} = 0) = 1$
+
+With $N^{OV}$ being the number of customers that *l* overtakes and $N^{PR}$ the number of customers present in the system (queing) when *l* gets in the system.
+
+If $N^{PR} = 1$, then *l* can overtake only 1 customer, if the time it takes to be served is shorter than the time it takes the other customers to be served. Because of the memoryless property we can assert the following:
+
+$P(N^{OV} = 0 | N^{PR} = 1) = \frac{\mu}{\mu + \mu} = \frac{1}{2}$
+
+Actually, in general:
+
+$P(N^{OV} = k | N^{PR} = n) = \frac{1}{n+1}$, $n \leq c - 1$, $x = 0,1$
+
+As in this case c=2, our *l* subject can' t overtake more than one customer.
+
+Now, if $n \geq c$, that is, *l* has to get in queue and wait to be served. When *l* gets served, there is also one more customer getting served. Because, again, of the memoryless property.
+
+$P(N^{OV} = k | N^{PR} = n) = \frac{1}{c}$, $n = c$, $k = 0,1$
+
+In our case, it does not matter how many customers are in the system, the probability of overtaking, conditioned to the number of customers already in the system, is $\frac{1}{2}$.
+
+Now, using Bayes' theorem and the total probability rule, we can find the probability of *l* overtaking another customer.
+
+$P(A | B) = \frac{P(A \cap B)}{P(B)}$
+
+$\frac{1}{2} \sum_{i=1}^{\infty} \pi_i = \frac{1}{2} \sum_{i=1}^{\infty} (\frac{1}{2^{i-1}}) (\frac{\lambda}{\mu})^{i} \pi_0$
+
+= $\sum_{i=1}^{\infty} (\frac{\lambda}{2 \mu})^i \pi_0 = (\sum_{i=0}^{\infty} ((\frac{\lambda}{2 \mu})^i) - 1) \pi_0$
+
+= $(\frac{1}{1-\frac{\lambda}{2 \mu}} - 1) \pi_0 = \frac{1}{2 (\frac{1}{1 - \frac{\lambda}{2 \mu} - 1})} (\frac{1}{1 - \frac{\lambda}{\mu}} - 1)$
+
+
+= $\frac{1}{1 - \frac{\lambda}{2 \mu}} - 1 = \frac{1 - (1 - \frac{\lambda}{2 \mu})}{1 - \frac{\lambda}{2 \mu}} = \frac{\frac{\lambda}{2 \mu}}{1 - \frac{\lambda}{2 \mu}}$
+
+
+= $2 (\frac{1}{1 - \frac{\lambda}{2 \mu}}) - 1 = \frac{2}{1 - \frac{\lambda}{2 \mu}} - 1 = \frac{2 - (1 - \frac{\lambda}{2 \mu})}{1 - \frac{\lambda}{2 \mu}}$
+
+= $\frac{1 + \frac{\lambda}{2 \mu}}{1 - \frac{\lambda}{2 \mu}}$
+
+Then:
+
+$\frac{\frac{\lambda}{2 \mu}}{1 \frac{\lambda}{2 \mu}} = \frac{\frac{\lambda}{2 \mu}}{\frac{2 \mu + \lambda}{2 \mu}} = \frac{\lambda}{2 \mu + \lambda}$
+
+So then we get:
+
+$P(N^{OV} = k) = \frac{\lambda}{2 \mu + \lambda}$, $k = c-1 = 1$
+
+# (d)
+
+We define the following function to simulate the queueing system:
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE, eval=FALSE}
+q <- function(n, l, m) {
+    s = cumsum(rexp(n, l))
+    t = rexp(n, m)
+
+    exit_time = numeric(n)
+    exit_time[1:2] = t[1:2]
+    for (i in 3:n) {
+        s_t <- sort(exit_time[1:(i-1)], decreasing = TRUE)
+
+        if (s[i])
+    }
+}
+```

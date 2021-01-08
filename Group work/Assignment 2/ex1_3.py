@@ -111,6 +111,5 @@ def decode(message, freqs, iters):
     return pd.DataFrame(df)
 
 result = decode(message,freq, 50000)
-result.to_csv('result.csv')
 plt.plot(result.sort_values('score')['score'].reset_index(drop=True))
 print(result[result['score'] == max(result['score'])])
