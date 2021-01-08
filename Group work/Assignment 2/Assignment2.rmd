@@ -22,6 +22,7 @@ library(nleqslv)
 library(rootSolve)
 library(stringi)
 library(randomcoloR)
+library(dplyr)
 ```
 
 # Problem 1
@@ -110,50 +111,32 @@ $N(t), t \in [0, \infty)$ is the non-homogenous Poisson process with rate $\lamb
 We define 8:00 as $t=0$ with the following integrable function and each unit of $t$ equals to 1 hour:
 
 $\lambda (t) = \begin{cases} 100 & 0 \leq t \leq \frac{1}{2} \\
-600t - 200 & \frac{1}{2} \leq t \leq \frac{3}{4} \\
-400t - 50 & \frac{3}{4} \leq t \leq 1 \\
--500t + 850 & 1 \leq t \leq 1.5 \\
+600t - 200 & \frac{1}{2} < t \leq \frac{3}{4} \\
+400t - 50 & \frac{3}{4} < t \leq 1 \\
+-500t + 850 & 1 < t \leq 1.5 \\
 \end{cases}$
 
 So,
 
-$E[N(t)] = \begin{cases} \end{cases}$
+$E[N(t)] = \begin{cases} 
+\int_{0}^t 100\,dt = 100t & 0 \leq t \leq \frac{1}{2} \\
+\int_{\frac{1}{2}}^t 600t - 200 \,dt + 50 = 300(t^2 - \frac{1}{4}) - 200(t - \frac{1}{2}) + 50 & \frac{1}{2} < t \leq \frac{3}{4} \\
+\int_{\frac{3}{4}}^t 400t - 50 \,dt + 93.75 = 25(8t^2 - 2t - 3) + 93.75 & \frac{3}{4} < t \leq 1 \\
+\int_{1}^t -500t + 850\,dt + 168.75 = -50(5t^2 - 17t + 12) + 168.75 & 1 < t \leq 1.5
+\end{cases}$
 
-**lots of latex here**
+Given that there is a limit of 150 vehicles:
+
+$E[N(t)] = \begin{cases} 
+100t & 0 \leq t \leq \frac{1}{2} \\
+300(t^2 - \frac{1}{4}) - 200(t - \frac{1}{2}) + 50 & \frac{1}{2} < t \leq \frac{3}{4} \\
+25(8t^2 - 2t - 3) + 93.75 & \frac{3}{4} < t < 0.94468  \\
+150 & t \geq 0.94468
+\end{cases}$
 
 # (b)
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-f <- function(t) {
-    ppois(149,lambda=600*t - 200)
-}
-nleqslv(0.8,f)
-```
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-
-test <- 0
-for (i in 1:149) {
-    test <- test + (exp(-1.609438) * 1.609438^i)/(factorial(i))
-}
-test
-```
-
-
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
-f <- function(l) {
-    1 - sum((exp(-l) * l^k)/(factorial(k))) - 0.8
-}
-
-tt = c()
-aa = seq(0,100,0.1)
-for (i in seq(0,100,0.1)) {
-    tt = c(tt, f(i))
-}
-test <- data.frame(val=aa, tt=tt)
-
-```
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide', fig.height=5.5, fig.width=10}
 # trying 0-200
 tt = c()
 aa = seq(0,200,1)
@@ -161,7 +144,7 @@ for (i in aa) {
     tt = c(tt, ppois(149,lambda=i))
 }
 test <- data.frame(val=aa, tt=tt)
-plot(test$tt, main='Probando entre 0 y 200')
+plot(test$val, test$tt, main='Probando entre 0 y 200')
 # trying 139-140
 tt = c()
 aa = seq(139,140,0.01)
@@ -169,62 +152,95 @@ for (i in aa) {
     tt = c(tt, ppois(149,lambda=i))
 }
 test <- data.frame(val=aa, tt=tt)
-plot(test$tt, main='Probando entre 139 y 140')
+plot(test$val, test$tt, main='Probando entre 139 y 140')
 ```
 
+Luego de hacer las pruebas para $\lambda (t)$ obtenemos lo siguiente:
+
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
-lambda = 139.6/1.5
-t = 0.747261
+lambda = 139.6
+t = 0.91232
 # 8:44 AM
 ```
 
+Por lo que $t = 0.91232$ horas (aproximadamente a las 8:54 de la mañana).
+
 # (c)
+
+The following function simulates a non-homogenous poisson process from a homogenous poisson process:
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 non_hom_poisson <- function(fun,l,a,b,start=0) {
-
-    # Homogenous poisson process arrival times
+    # This function generates a non-homogenous poisson 
+    # process from a homogenous poisson process
+    # PARAMS:
+    # fun:   if the non-homogenous poisson process has
+    #        multiple functions per time subinterval
+    #        this parameters represents such function
+    # l:     lambda for the homogenous poisson process
+    # a:     lower bound for the time subinterval
+    # b:     upper bound for the time subinterval
+    # start: this parameter is used to keep track of 
+    #        the process count.
+    
+    # We generate the homogenous poisson process 
+    # arrival times
     val <- rpois(1,l*(b-a))
     intervals <- (b-a) * sort(runif(val)) + a
 
     # Non-homogenous poisson process
-    evs <- length(intervals)
-    nh_val <- 0 + start
-    nh_intervals <- c()
+    evs <- length(intervals) # lenght of arrival times 
+    nh_val <- 0 + start # start of the event count
+    nh_intervals <- c() # arrival times for the NHPP
     for (i in 1:evs) {
-        if (runif(1) < fun(intervals[i])/l) {
-            nh_intervals <- c(nh_intervals, intervals[i])
-            nh_val <- nh_val+1
+        if (runif(1) < fun(intervals[i])/l) { 
+            # only including intervals from the HPP which
+            # match with fun(intervals[i])/l probability
+            nh_intervals <- c(nh_intervals, intervals[i]) 
+            nh_val <- nh_val+1 # adding one to the event count
         }
     }
-    nh_events <- seq(1+start,nh_val,1)
+    nh_events <- seq(1+start,nh_val,1) # events since the previous group
     return(list(arrival_times=nh_intervals, events=nh_events))
 }
+```
 
+\newpage
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
 simulation <- function(iters, functions, lambdas, ints) {
-    # processes
+    # This function simulates from the NHPP
+    # iters:     number of iterations to plot and add to the list of
+    #            dataframes
+    # functions: list of functions corresponding to the lambda function
+    # lambdas:   list of lambdas for each subinterval
+    # ints:      lists of vectors of 2 elements each containing the intervals
+    #            that correspond to each element of lambdas and functions lists
     p <- list()
-
     for (i in 1:iters) {
-        maximum <- 0
-        arr_times <- c()
-        events <- c()
+        maximum <- 0 # start for the next NHPP simulation to continue count
+        arr_times <- c() # arrival times
+        events <- c() # event counts
         for (k in 1:4) {
-            int <- non_hom_poisson(lambda_funs[[k]],lambdas[[k]],ints[[k]][1],ints[[k]][2],start=maximum)
-            maximum <- max(int$events)
-            arr_times <- c(arr_times, int$arrival_times)
+            int <- non_hom_poisson(lambda_funs[[k]],lambdas[[k]],
+                                   ints[[k]][1],ints[[k]][2],
+                                   start=maximum)
+            maximum <- max(int$events) # remembering last event count
+            arr_times <- c(arr_times, int$arrival_times) 
             events <- c(events, int$events)
         }
         p[[i]] <- data.frame(arrival_times=arr_times, events=events)
-
         # plots
-        if (i == 1) {plot(arr_times, events, cex=0.5, pch='.', col=randomColor(), xlim=c(0,1.5), ylim=c(0,150))}
+        if (i == 1) {plot(arr_times, events, cex=0.5, pch='.', 
+                          col=randomColor(), xlim=c(0,1.5), 
+                          ylim=c(0,150))}
         lines(arr_times, events, col=randomColor())
     }
-
     return(p)
 }
+```
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # subintervals
 int1 <- c(  0, 1/2)
 int2 <- c(1/2, 3/4)
@@ -234,9 +250,9 @@ ints <- list(int1, int2, int3, int4)
 
 # lambdas
 lambda_1 <- 100
-lambda_2 <- mean(600*seq(1/2,3/4,0.001)-200)
-lambda_3 <- mean(400*seq(3/4,1,0.001)-50)
-lambda_4 <- mean(-500*seq(1,1.5,0.001)+850)
+lambda_2 <- 250
+lambda_3 <- 350
+lambda_4 <- 350
 lambdas <- list(lambda_1, lambda_2, lambda_3, lambda_4)
 
 # lambda functions per t subinterval
@@ -245,11 +261,27 @@ l2 <- function(t){600*t-200}
 l3 <- function(t){400*t-50}
 l4 <- function(t){-500*t+850}
 lambda_funs <- list(l1, l2, l3, l4)
+```
 
-data <- simulation(100, lambda_funs, lambdas, ints)
+\newpage
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE, fig.height=16, fig.width=14}
+data <- simulation(1000, lambda_funs, lambdas, ints)
 ```
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
+ratio <- 0
+for (i in 1:length(data)) {
+    df <- data.frame(data[[i]])
+    cnt <- df %>% filter(arrival_times < 0.91232 & events >= 150) %>% dplyr::count()
+    if (cnt[1] >= 1) {
+        ratio <- ratio + 1
+    }
+}
+ratio/1000
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 tt = c()
 aa = seq(0,140,1)
 bb = seq(0, 30,1)
@@ -259,28 +291,27 @@ for (i in bb) {
     }
 }
 test <- data.frame(val=aa, tt=tt)
-test
 write.csv(test, 'test.csv')
 ```
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 test <- 0
 for (i in 0:143) {
     test <- test + (exp(-140) * 140^i)/(factorial(i))
-    print((exp(-140) * 140^i)/(factorial(i)))
 }
-test
 ```
 
 # Problem 3
 
 # (a)
 
-$\begin{pmatrix}
+Our infinitesimal generator is the following:
+
+$Q = \begin{pmatrix}
 - \lambda & \lambda & 0 & 0 & \dots \\
 \mu & - (\lambda + \mu) & \lambda & 0 & \dots \\
 0 & 2 \mu & - (2 \mu + \lambda) & \lambda & \dots \\
-& \vdots & & \ddots & 
+\vdots & \vdots & \vdots & \vdots & \ddots
 \end{pmatrix}$
 
 # (b)
@@ -330,4 +361,26 @@ $\pi_n = \frac{\lambda^n}{2^{n-1}{\mu_n} \pi_0} \frac{1}{2 (\frac{1}{1 - \frac{\
 finally:
 
 $\pi_n = \frac{1}{2^{n-1}} (\frac{\lambda}{\mu})^{n} \pi_0$
+
+The infinite sum converges when $|\frac{\lambda}{2 \mu}| < 1$ in which case the stationary distribution P exists.
+
+Then:
+
+$L = \sum_{n=0}^{\infty} \pi_n * n$
+
+Using the following sum:
+
+$\sum_{i=0}^{n-1} i a^i = \frac{a - na^n + (n-1)a^{n+1}}{(1-a)^2}$
+
+As n approaches infinity:
+
+$\sum_{i=0}^{\infty} i a^i = \frac{a}{(1-a)^2}$
+
+We get the following:
+
+$L = \pi_0 [1 + \sum_{n=0}^{infty} (\frac{\lambda}{\mu})^n * \frac{n}{2^{n-1}}]$
+
+$L = \pi_0 [1 + 2 \sum_{n=0}^{infty} (\frac{\lambda}{2 \mu})^n * n]$
+
+$L = \pi_0 [1 + 2 \frac{\frac{\lambda}{2 \mu}}{(1 - \frac{\lambda}{2 \mu})^2}]$
 

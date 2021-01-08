@@ -16,7 +16,7 @@ def transf_log(table):
 freq = transf_log(freq)
 
 with open('./data/messages.txt') as f:
-    message = f.readlines()[0].replace('\n','')
+    message = f.readlines()[9].replace('\n','')
 
 def decode(message, freqs, iters):
     # messages per iteration
@@ -110,7 +110,7 @@ def decode(message, freqs, iters):
           'msg':[msg[1] for msg in msg_iters.values()]}
     return pd.DataFrame(df)
 
-result = decode(message,freq, 1000000)
+result = decode(message,freq, 50000)
 result.to_csv('result.csv')
 plt.plot(result.sort_values('score')['score'].reset_index(drop=True))
 print(result[result['score'] == max(result['score'])])
