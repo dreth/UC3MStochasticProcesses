@@ -21,6 +21,7 @@ library(matlib)
 library(nleqslv)
 library(rootSolve)
 library(stringi)
+library(randomcoloR)
 ```
 
 # Problem 1
@@ -123,11 +124,10 @@ $E[N(t)] = \begin{cases} \end{cases}$
 # (b)
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-f <- function(l) {
-    sum((exp(-l) * l^k)/(factorial(k))) - 1
+f <- function(t) {
+    ppois(149,lambda=600*t - 200)
 }
-k <- 0:149
-nleqslv(0,f)
+nleqslv(0.8,f)
 ```
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -153,16 +153,102 @@ test <- data.frame(val=aa, tt=tt)
 
 ```
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+# trying 0-200
 tt = c()
 aa = seq(0,200,1)
 for (i in aa) {
     tt = c(tt, ppois(149,lambda=i))
 }
 test <- data.frame(val=aa, tt=tt)
-test
-write.csv(test, 'test.csv')
+plot(test$tt, main='Probando entre 0 y 200')
+# trying 139-140
+tt = c()
+aa = seq(139,140,0.01)
+for (i in aa) {
+    tt = c(tt, ppois(149,lambda=i))
+}
+test <- data.frame(val=aa, tt=tt)
+plot(test$tt, main='Probando entre 139 y 140')
 ```
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+lambda = 139.6/1.5
+t = 0.747261
+# 8:44 AM
+```
+
+# (c)
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+non_hom_poisson <- function(fun,l,a,b,start=0) {
+
+    # Homogenous poisson process arrival times
+    val <- rpois(1,l*(b-a))
+    intervals <- (b-a) * sort(runif(val)) + a
+
+    # Non-homogenous poisson process
+    evs <- length(intervals)
+    nh_val <- 0 + start
+    nh_intervals <- c()
+    for (i in 1:evs) {
+        if (runif(1) < fun(intervals[i])/l) {
+            nh_intervals <- c(nh_intervals, intervals[i])
+            nh_val <- nh_val+1
+        }
+    }
+    nh_events <- seq(1+start,nh_val,1)
+    return(list(arrival_times=nh_intervals, events=nh_events))
+}
+
+simulation <- function(iters, functions, lambdas, ints) {
+    # processes
+    p <- list()
+
+    for (i in 1:iters) {
+        maximum <- 0
+        arr_times <- c()
+        events <- c()
+        for (k in 1:4) {
+            int <- non_hom_poisson(lambda_funs[[k]],lambdas[[k]],ints[[k]][1],ints[[k]][2],start=maximum)
+            maximum <- max(int$events)
+            arr_times <- c(arr_times, int$arrival_times)
+            events <- c(events, int$events)
+        }
+        p[[i]] <- data.frame(arrival_times=arr_times, events=events)
+
+        # plots
+        if (i == 1) {plot(arr_times, events, cex=0.5, pch='.', col=randomColor(), xlim=c(0,1.5), ylim=c(0,150))}
+        lines(arr_times, events, col=randomColor())
+    }
+
+    return(p)
+}
+
+# subintervals
+int1 <- c(  0, 1/2)
+int2 <- c(1/2, 3/4)
+int3 <- c(3/4,   1)
+int4 <- c(  1, 1.5)
+ints <- list(int1, int2, int3, int4)
+
+# lambdas
+lambda_1 <- 100
+lambda_2 <- mean(600*seq(1/2,3/4,0.001)-200)
+lambda_3 <- mean(400*seq(3/4,1,0.001)-50)
+lambda_4 <- mean(-500*seq(1,1.5,0.001)+850)
+lambdas <- list(lambda_1, lambda_2, lambda_3, lambda_4)
+
+# lambda functions per t subinterval
+l1 <- function(t){100}
+l2 <- function(t){600*t-200}
+l3 <- function(t){400*t-50}
+l4 <- function(t){-500*t+850}
+lambda_funs <- list(l1, l2, l3, l4)
+
+data <- simulation(100, lambda_funs, lambdas, ints)
+```
+
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 tt = c()
 aa = seq(0,140,1)
@@ -185,3 +271,63 @@ for (i in 0:143) {
 }
 test
 ```
+
+# Problem 3
+
+# (a)
+
+$\begin{pmatrix}
+- \lambda & \lambda & 0 & 0 & \dots \\
+\mu & - (\lambda + \mu) & \lambda & 0 & \dots \\
+0 & 2 \mu & - (2 \mu + \lambda) & \lambda & \dots \\
+& \vdots & & \ddots & 
+\end{pmatrix}$
+
+# (b)
+
+We solve the following system:
+
+$\begin{cases}
+\sum_{i = 1}^{\infty} \pi_i = 1 \\
+\lambda \pi_0 = \mu \pi_1 \\
+\lambda \pi_1 = 2 \mu \pi_2 \\
+\vdots \\
+\lambda \pi_{n-1} = 2 \mu \pi_n \\
+\vdots \\
+\end{cases}$
+
+First we have:
+
+$\pi_1 = \frac{\lambda \pi_0}{\mu} \\
+\pi_2 = \frac{\lambda^2 \pi_0}{2 \mu^2} \\
+\pi_3 = \frac{\lambda^3 \pi_0}{2^2 \mu^3} \\
+\vdots \\
+\pi_n = \frac{\lambda^n \pi_0}{2^{n-1} \mu^n} \\
+\vdots$
+
+Then:
+
+$\sum_{i=0}^{\infty} \pi_i = \pi_0 + \frac{\lambda \pi_0}{\mu} + \frac{\lambda^2 \pi_0}{2 \mu^2} + \dots + \frac{\lambda^n \pi_0}{2^{n-1} \mu^n} + \dots = 1$
+
+And so factoring $\pi_0$ we get:
+
+$\pi_0 (1 + \frac{\lambda}{\mu} + \frac{\lambda^2}{2 \mu^2} + \dots) = \pi_0 (1 + \sum_{i=1}^{\infty} \frac{1}{2^{i-1}} (\frac{\lambda}{\mu})^{i})$
+
+Then multiplying $\frac{2}{2}$ to the summation:
+
+$\pi_0 (1 + \frac{2}{2} \sum_{i=1}^{\infty} \frac{1}{2^{i-1}} (\frac{\lambda}{\mu})^{i})$
+
+= $\pi_0 (2 \sum_{i=0}^{\infty} (\frac{\lambda}{2 \mu})^{i} - 1)$
+
+$\pi_0 (2 (\frac{1}{1 - \frac{\lambda}{2 \mu}}) - 1) = 1$
+
+$\pi_0 = \frac{1}{2 (\frac{1}{1 - \frac{\lambda}{2 \mu}}) - 1}$
+
+$\vdots$
+
+$\pi_n = \frac{\lambda^n}{2^{n-1}{\mu_n} \pi_0} \frac{1}{2 (\frac{1}{1 - \frac{\lambda}{2 \mu}}) - 1}$
+
+finally:
+
+$\pi_n = \frac{1}{2^{n-1}} (\frac{\lambda}{\mu})^{n} \pi_0$
+

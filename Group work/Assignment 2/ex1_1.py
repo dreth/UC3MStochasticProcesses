@@ -1,22 +1,24 @@
 from random import choice
 import numpy as np
 from copy import deepcopy
+import pandas as pd
 
 freq =  np.loadtxt('./data/Englishcharacters.txt', usecols=range(27))
 
 def transf_minmax(table,a,b):
     return (b-a)*((table - np.min(table))/(np.max(table) - np.min(table))) + a 
 
-transf_minmax(freq,1,2)
+def transf_log(table):
+    return np.log(table + 1)
+
+freq = transf_log(freq)
  
 with open('./data/messages.txt') as f:
     message = f.readlines()[0].replace('\n','')
 
 def decode(message, freqs, iters):
-    # msg to list
-    msg = list(message)
-    init_msg = deepcopy(msg)
-    
+    # messages per iteration
+    msg_iters = {}
     # identity function
     fvals = np.array([x for x in range(27)])
     letters = ["a", "b", "c", "d",
@@ -26,17 +28,21 @@ def decode(message, freqs, iters):
                 "q", "r", "s", "t", 
                 "u", "v", "w", "x", 
                 "y", "z", " "]
+    init_letters = deepcopy(letters)
     cd = {l:v for l,v in zip(letters,fvals)}
+    init_cd = deepcopy(cd)
     def f(c):
         return cd[c]
     
     # score function
     def score(fun):
-        p = 1
+        p = 0
         for i in range(1,len(msg)):
-            if freq[fun(msg[i-1]),fun(msg[i])] != 0:
-                p = p*freq[fun(msg[i-1]),fun(msg[i])]
+            p = p + freq[fun(msg[i-1]),fun(msg[i])]
         return p
+    
+    # msg to list
+    msg = list(message)
     
     for i in range(iters):
 
@@ -47,7 +53,7 @@ def decode(message, freqs, iters):
         letters_n[ch1] = letters[ch2]
         letters_n[ch2] = letters[ch1]
         cd_n = {l:v for l,v in zip(letters_n,fvals)}
-
+        
         # f asterisk
         def f_n(c):
             return cd_n[c]
@@ -58,14 +64,18 @@ def decode(message, freqs, iters):
         if cond:
             letters = deepcopy(letters_n)
             cd = {l:v for l,v in zip(letters,fvals)}
-            print(cd)
             for k in range(len(msg)):
-                msg[k] = letters[cd[msg[k]]]
+                msg[k] = letters[init_cd[msg[k]]]
+            msg_iters[i] = ''.join([x for x in msg])
         else:
-            for k in range(len(msg)):
-                msg[k] = letters[cd[msg[k]]]
-        print(init_msg == msg)
-    return ''.join([x for x in msg])
+            pass
+        
+    
+    # put in a dataframe
+    df = {'iter':[it for it in msg_iters.keys()], 
+          'msg':[msg for msg in msg_iters.values()]}
+    return pd.DataFrame(df)
 
 
-decode(message,freq, 10) == message
+result = decode(message,freq, 10000)
+result.to_csv('result.csv')
