@@ -5,12 +5,13 @@ date: "November 27th, 2020"
 output: 'pdf_document'
 ---
 
-```{r, echo = FALSE}
+```{r setup, echo = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "./figures/"
 )
+reticulate::use_python('/home/dreth/anaconda3/bin/python')
 ```
 
 Importing libraries
@@ -24,39 +25,56 @@ library(stringi)
 library(randomcoloR)
 library(dplyr)
 library(reticulate)
-```
 
-```{r setup, include=FALSE}
-use_python('/home/dreth/anaconda3/bin/python')
 ```
 
 # Problem 1
 
-```{python, eval=FALSE}
+```{python}
+# importing libraries
 import numpy as np
 from copy import deepcopy
 import pandas as pd
-from nltk.corpus import words
 import matplotlib.pyplot as plt
-import threading as th
+from nltk.corpus import words
 
+# Importing the matrix with the frequencies
 freq =  np.loadtxt('./data/Englishcharacters.txt', usecols=range(27))
 
-def transf_minmax(table,a,b):
-    return (b-a)*((table - np.min(table))/(np.max(table) - np.min(table))) + a 
-
+# transformation function for table values
 def transf_log(table):
     return np.log(table + 1)
 
+# applying the transformation function
 freq = transf_log(freq)
 
+# importing the messages and only selecting the 
+# message with index 0, as this is the one corresponding
+# to group 1
 with open('./data/messages.txt') as f:
-    message = f.readlines()[9].replace('\n','')
+    message = f.readlines()[0].replace('\n','')
 
+# decode function
 def decode(message, freqs, iters):
-    # messages per iteration
+    """
+    Function to decode a message enconded 
+    using a substitution cipher utilizing the
+    Metropolis-Hastings algorithm.
+
+    Params:
+    message = string to decode
+    freqs = frequency table for transitions of letters
+            to input
+    iters = amount of iterations to perform
+    """
+    # dictionary to organize the iterations
+    # the score and the result of the attempt
+    # to decode the message corresponding to that
+    # iteration
     msg_iters = {}
-    # identity function
+
+    # defining the identity function
+    # all letters to be used excluding spaces
     letters = ["a", "b", "c", "d",
                 "e", "f", "g", "h", 
                 "i", "j", "k", "l", 
@@ -64,78 +82,118 @@ def decode(message, freqs, iters):
                 "q", "r", "s", "t", 
                 "u", "v", "w", "x", 
                 "y", "z"]
+    # creating a copy of the original letters
+    # to use as key for the dictionaries
     init_letters = deepcopy(letters)
-    cd = {l:l for l,l in zip(init_letters,letters)}
+    # creating a dictionary with init_letters as keys
+    # and letters as values
+    cd = {l:d for l,d in zip(init_letters,letters)}
+    # every time we update with {' ':' '} we add the space
+    # to the dictionary
     cd.update({' ':' '})
+    # define a function that just uses the previous
+    # dictionary to seek the letters
     def f(c):
         return cd[c]
     
-    # mapping letters to cols
+    # this dictionary and subsequent function maps each letter
+    # to a column/row in the freq matrix, ex: 'a':0, 'b':1 
     fvals = np.array([x for x in range(len(letters))])
     cd_map = {l:v for l,v in zip(letters,fvals)}
     cd_map.update({' ':26})
     def f_map(c):
         return cd_map[c]
 
-    # score function
+    # score function uses sum of logs
     def score(fun):
         p = 0
         for i in range(1,len(msg)):
             p = p + freq[f_map(fun(msg[i-1])),f_map(fun(msg[i]))]
         return p
     
-    # msg to list
+    # converting the message to a list in order to
+    # go through the letters in pairs
     msg = list(message)
 
-    # letters to modify the cipher
+    # letters list, this one shall be modified
+    # every time the score passes the test
     letters_n = deepcopy(letters)
 
+    # loop iters amount of times
     for i in range(iters):
-
         # randomly choose 2 numbers and replace the 2 chosen 
         # vals in a copy of letters
-        ch1 = np.random.randint(1,len(letters))
-        ch2 = np.random.randint(1,len(letters))
+        ch1 = np.random.randint(0,len(letters))
+        ch2 = np.random.randint(0,len(letters))
         plc1 = deepcopy(letters_n[ch1])
         plc2 = deepcopy(letters_n[ch2])
         letters_n[ch1] = plc2
         letters_n[ch2] = plc1
 
+        # create the dictionary for the f* function
         cd_n = {l:v for l,v in zip(init_letters,letters_n)}
+        # add the space to it after scramble
         cd_n.update({' ':' '})
-
-        # f asterisk
+        # f* definition
         def f_n(c):
             return cd_n[c]
-
-        #loop with scores
+    
+        # calculating the score for each function and its ratio
         scr_f = score(f)
         scr_fn = score(f_n)
-        scr = scr_fn/scr_f
-
-        # print(f'score f*: {scr_fn}, score f: {scr_f}, ratio: {scr}')
-        cond = np.random.rand() <= scr
-
+        a = scr_fn/scr_f
+        # test if a random number is lower than min(a, 1)
+        cond = np.random.rand() <= min(a,1)
+        # if condition is true
         if cond:
+            # replacing the letters list with the one from f*
             letters = deepcopy(letters_n)
+            # updating the dictionary with the new letters list after replacing
             cd = {l:v for l,v in zip(init_letters,letters)}
             cd.update({' ':' '})
+            # f re-definition
+            def f(c):
+                return cd[c]
+            # replacing the letters in the message using 
+            # the new f replaced by f*
             for k in range(len(msg)):
                 msg[k] = f(msg[k])
-            msg_iters[i] = (scr,''.join([x for x in msg]))
+            # adding score and joining the message to the dictionary
+            # to then transform into a dataframe
+            msg_iters[i] = (a,''.join([x for x in msg]))
+        # if condition is false
         else:
+            # apply the f function to the message instead
             for k in range(len(msg)):
                 msg[k] = f(msg[k])
+        # reset the message
         msg = list(message)
-    
-    # put in a dataframe
+
+        # break the loop if 2 words are found in the english language corpus
+        try:
+            msg_list = msg_iters[i].split(' ')
+            fw = {'w1':np.random.choice(msg_list),
+                  'w2':np.random.choice(msg_list)}
+            conds = {w_n:(w in words.words()) for w_n,w in fw.items()}
+            vals = list(conds.values())
+            if False not in vals:
+                print(f'found at iteration: {i}')
+                print(msg_iters[i])
+                print(f'words found: {list(conds.keys())}')
+                break
+        # otherwise continue
+        except:
+            continue
+    # put the information in a dataframe, iters, score and the messages
     df = {'iter':[it for it in msg_iters.keys()],
           'score':[msg[0] for msg in msg_iters.values()],
           'msg':[msg[1] for msg in msg_iters.values()]}
+    # return the dataframe
     return pd.DataFrame(df)
 
 result = decode(message,freq, 50000)
 plt.plot(result.sort_values('score')['score'].reset_index(drop=True))
+plt.show()
 print(result[result['score'] == max(result['score'])])
 ```
 
@@ -470,9 +528,9 @@ $\sum_{i=0}^{\infty} i a^i = \frac{a}{(1-a)^2}$
 
 We get the following:
 
-$L = \pi_0 [1 + \sum_{n=0}^{infty} (\frac{\lambda}{\mu})^n * \frac{n}{2^{n-1}}]$
+$L = \pi_0 [1 + \sum_{n=0}^{\infty} (\frac{\lambda}{\mu})^n * \frac{n}{2^{n-1}}]$
 
-$L = \pi_0 [1 + 2 \sum_{n=0}^{infty} (\frac{\lambda}{2 \mu})^n * n]$
+$L = \pi_0 [1 + 2 \sum_{n=0}^{\infty} (\frac{\lambda}{2 \mu})^n * n]$
 
 $L = \pi_0 [1 + 2 \frac{\frac{\lambda}{2 \mu}}{(1 - \frac{\lambda}{2 \mu})^2}]$
 
@@ -532,26 +590,59 @@ $P(N^{OV} = k) = \frac{\lambda}{2 \mu + \lambda}$, $k = c-1 = 1$
 
 We define the following function to simulate the queueing system:
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE, eval=FALSE}
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+# Simulation of the System (M/M/2)
 q <- function(customers, l, m) {
-    exp_at <- rexp(customers,l)
-    ArrivalTimes <- rep(0,customers)
-    ArrivalTimes[1] <- exp_at[1]
-    for (i in 2:customers) {
-        ArrivalTimes[i] <- ArrivalTimes[i-1] + exp_at[i]
-    } 
-    ServiceTimes <- rexp(customers, m)
-    ExitTimes <- rep(0,customers)
-    ExitTimes[1:2] <- ServiceTimes[1:2]
-    for (i in 3:customers) {
-        SortedTimes <- sort(ExitTimes[1:(i-1)], decreasing=T)
-        if (ArrivalTimes[i] < SortedTimes[2]) {ExitTimes[i] <- SortedTimes[2] + ServiceTimes[i]}
-         else {ExitTimes[i] <- ArrivalTimes[i] + ServiceTimes[i]}
-    }
-    times <- data.frame(arrival=ArrivalTimes,
-                        exit=ExitTimes,
-                        service=ServiceTimes)
-    return(times)
+  # This function generates a M/M/2 queue system and returns a matrix 
+  # with columns of ArrivalTimes, exit=ExitTimes and service=ServiceTimes
+  # PARAMS:
+  # customers:   number of customers in the supermarket
+  # l:     lambda for the homogenous poisson process 
+  #    (customers arrive to the unique cashiers waiting
+  #    line according this rate)
+  # m:     mu for the exponential distribution
+  #    (The times to be served are independent and 
+  #    distributed as exponential with rate mu)
+
+  # interval for arrival times
+  exp_at <- rexp(customers,l)
+  
+  # we have as many arrival times as the number of customers
+  ArrivalTimes <- rep(0,customers) 
+
+  ArrivalTimes[1] <- exp_at[1]
+  for (i in 2:customers) {
+    # arrival time = the previous arrival time + the interval between 2 customers
+    ArrivalTimes[i] <- ArrivalTimes[i-1] + exp_at[i]
+  } 
+  
+  # service time distributed according to mu
+  ServiceTimes <- rexp(customers, m)
+  
+  # we have as many exit times as the number of customers
+  ExitTimes <- rep(0,customers)
+  
+  # the first two exit time is equal to the service time due to we have 2 cashiers
+  ExitTimes[1:2] <- ServiceTimes[1:2]
+  for (i in 3:customers) {
+    # we sort exit time from larger to smaller
+    SortedTimes <- sort(ExitTimes[1:(i-1)], decreasing=T)
+    
+    # all of the two cashiers are occupied, then the new customer will have to 
+    # wait until at least one of them leaves the supermarket (the faster one)
+    # then the exit time of the new customer is exited time of the previous faster customer plus 
+    # the service time of this new customer
+    if (ArrivalTimes[i] < SortedTimes[2]) {ExitTimes[i] <- SortedTimes[2] + ServiceTimes[i]}
+    
+    # one or two cashiers are free, then the exit time is the arrival time plus the service time
+    else {ExitTimes[i] <- ArrivalTimes[i] + ServiceTimes[i]}
+  }
+  
+  # create a matrix and return it
+  times <- data.frame(arrival=ArrivalTimes,
+                      exit=ExitTimes,
+                      service=ServiceTimes)
+  return(times)
 }
 ```
 
@@ -578,16 +669,25 @@ for (i in 1:length(times$service)){
 We define the following function to calculate the overtaking probability:
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
-d <- function(customers, ot_prob, queue, ExitTimes) {
-    for (i in queue:(customers - queue)) {
-        ot_prob <- ot_prob + sum(ExitTimes[i] < ExitTimes[1:(i-1)])
-    }
-    r <- customers-2*queue
-    ot_prob <- ot_prob/r
-    return(ot_prob)
+d <- function(customers, queue, ExitTimes) {
+  # This function generates a M/M/2 queue system and returns 
+  # the probability of overtaking
+  # PARAMS:
+  # customers:   number of customers in the supermarket
+  # queue:       number of people in the quene
+  # ExitTimes:   the exited times of each customer
+
+  # we define the number of people of overtaking
+  ot <- 0
+  for (i in queue:(customers - queue)) {
+
+    # the number of people overtaking of all customers is the previous 
+    # number plus 1 if the exit time of the i-th customer is smaller (earlier) 
+    # than the (i-1)th customer 
+    ot <- ot + sum(ExitTimes[i] < ExitTimes[1:(i-1)])
+  }
+  r <- customers-2*queue
+  ot_prob <- ot/r
+  return(ot_prob)
 }
-```
-
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
-
 ```
