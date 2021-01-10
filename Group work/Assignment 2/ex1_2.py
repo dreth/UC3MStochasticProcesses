@@ -82,11 +82,8 @@ def decode(message, freqs, iters):
         
         try:
             msg_list = msg_iters[i].split(' ')
-            fw = {'w1':np.random.choice(msg_list),
-                  'w2':np.random.choice(msg_list),
-                  'w3':np.random.choice(msg_list)}
-            conds = {w_n:(w in words.words()) for w_n,w in fw.items()}
-            if (len(fw) > 3) and (False not in conds.values()):
+            conds = [np.random.choice(msg_list) in words.words() for x in range(10)]
+            if False not in conds.values():
                 print(f'found at iteration: {i}')
                 print(msg_iters[i])
                 print(f'words found: {[x for x in conds.values()]}')

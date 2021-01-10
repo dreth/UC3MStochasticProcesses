@@ -112,25 +112,12 @@ Zhang, Daniel Alonso}
 \begin{document}
 \maketitle
 
-Importing libraries
-
-\begin{verbatim}
-#> Package:  markovchain
-#> Version:  0.8.5-2
-#> Date:     2020-09-07
-#> BugReport: https://github.com/spedygiorgio/markovchain/issues
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-\end{verbatim}
-
 \hypertarget{problem-1}{%
 \section{Problem 1}\label{problem-1}}
+
+This is our implementation of the decoding algorithm, it is implemented
+using python. Every single step is explained during the code with its
+corresponding block or line(s) of code.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -211,7 +198,7 @@ Importing libraries
     \KeywordTok{def}\NormalTok{ score(fun):}
 \NormalTok{        p }\OperatorTok{=} \DecValTok{0}
         \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{,}\BuiltInTok{len}\NormalTok{(msg)):}
-\NormalTok{            p }\OperatorTok{=}\NormalTok{ p }\OperatorTok{+}\NormalTok{ freq[f_map(fun(msg[i}\DecValTok{-1}\NormalTok{])),f_map(fun(msg[i]))]}
+\NormalTok{            p }\OperatorTok{=}\NormalTok{ p }\OperatorTok{+}\NormalTok{ freqs[f_map(fun(msg[i}\DecValTok{-1}\NormalTok{])),f_map(fun(msg[i]))]}
         \ControlFlowTok{return}\NormalTok{ p}
     
     \CommentTok{# converting the message to a list in order to}
@@ -244,9 +231,9 @@ Importing libraries
         \CommentTok{# calculating the score for each function and its ratio}
 \NormalTok{        scr_f }\OperatorTok{=}\NormalTok{ score(f)}
 \NormalTok{        scr_fn }\OperatorTok{=}\NormalTok{ score(f_n)}
-\NormalTok{        a }\OperatorTok{=}\NormalTok{ scr_fn}\OperatorTok{/}\NormalTok{scr_f}
+\NormalTok{        a }\OperatorTok{=}\NormalTok{ np.exp(scr_fn }\OperatorTok{-}\NormalTok{ scr_f)}
         \CommentTok{# test if a random number is lower than min(a, 1)}
-\NormalTok{        cond }\OperatorTok{=}\NormalTok{ np.random.rand() }\OperatorTok{<=} \BuiltInTok{min}\NormalTok{(a,}\DecValTok{1}\NormalTok{)}
+\NormalTok{        cond }\OperatorTok{=}\NormalTok{ np.random.rand() }\OperatorTok{<} \BuiltInTok{min}\NormalTok{(a,}\DecValTok{1}\NormalTok{)}
         \CommentTok{# if condition is true}
         \ControlFlowTok{if}\NormalTok{ cond:}
             \CommentTok{# replacing the letters list with the one from f*}
@@ -264,56 +251,58 @@ Importing libraries
             \CommentTok{# adding score and joining the message to the dictionary}
             \CommentTok{# to then transform into a dataframe}
 \NormalTok{            msg_iters[i] }\OperatorTok{=}\NormalTok{ (a,}\StringTok{''}\NormalTok{.join([x }\ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ msg]))}
+
+            \CommentTok{# we separate the message by words}
+\NormalTok{            msg_list }\OperatorTok{=}\NormalTok{ msg_iters[i][}\DecValTok{1}\NormalTok{].split(}\StringTok{' '}\NormalTok{)}
+            \CommentTok{# we test 5 random words to see if they are actually words }
+            \CommentTok{# present in the word corpus}
+\NormalTok{            conds }\OperatorTok{=}\NormalTok{ [np.random.choice(msg_list) }\KeywordTok{in}\NormalTok{ words.words() }\ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{5}\NormalTok{)]}
+            \CommentTok{# we break the loop if the 5 true words are found}
+            \ControlFlowTok{if} \VariableTok{False} \KeywordTok{not} \KeywordTok{in}\NormalTok{ conds:}
+                \BuiltInTok{print}\NormalTok{(}\StringTok{'Cipher used:}\CharTok{\textbackslash{}n}\StringTok{'}\NormalTok{)}
+                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'}\SpecialCharTok{\{cd\}}\SpecialStringTok{'}\NormalTok{)}
+                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'}\CharTok{\textbackslash{}n}\SpecialStringTok{found at iteration: }\SpecialCharTok{\{i\}}\CharTok{\textbackslash{}n}\SpecialStringTok{Message (may contain wrong letters):'}\NormalTok{)}
+                \ControlFlowTok{return}\NormalTok{ msg_iters[i]}
         \CommentTok{# if condition is false}
         \ControlFlowTok{else}\NormalTok{:}
+            \CommentTok{# resetting the letters after a failed score comparison}
+\NormalTok{            letters_n }\OperatorTok{=}\NormalTok{ deepcopy(letters)}
             \CommentTok{# apply the f function to the message instead}
             \ControlFlowTok{for}\NormalTok{ k }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(msg)):}
 \NormalTok{                msg[k] }\OperatorTok{=}\NormalTok{ f(msg[k])}
+        
         \CommentTok{# reset the message}
 \NormalTok{        msg }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(message)}
 
-        \CommentTok{# break the loop if 2 words are found in the english language corpus}
-        \ControlFlowTok{try}\NormalTok{:}
-\NormalTok{            msg_list }\OperatorTok{=}\NormalTok{ msg_iters[i].split(}\StringTok{' '}\NormalTok{)}
-\NormalTok{            fw }\OperatorTok{=}\NormalTok{ \{}\StringTok{'w1'}\NormalTok{:np.random.choice(msg_list),}
-                  \StringTok{'w2'}\NormalTok{:np.random.choice(msg_list)\}}
-\NormalTok{            conds }\OperatorTok{=}\NormalTok{ \{w_n:(w }\KeywordTok{in}\NormalTok{ words.words()) }\ControlFlowTok{for}\NormalTok{ w_n,w }\KeywordTok{in}\NormalTok{ fw.items()\}}
-\NormalTok{            vals }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(conds.values())}
-            \ControlFlowTok{if} \VariableTok{False} \KeywordTok{not} \KeywordTok{in}\NormalTok{ vals:}
-                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'found at iteration: }\SpecialCharTok{\{i\}}\SpecialStringTok{'}\NormalTok{)}
-                \BuiltInTok{print}\NormalTok{(msg_iters[i])}
-                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'words found: }\SpecialCharTok{\{}\BuiltInTok{list}\NormalTok{(conds.keys())}\SpecialCharTok{\}}\SpecialStringTok{'}\NormalTok{)}
-                \ControlFlowTok{break}
-        \CommentTok{# otherwise continue}
-        \ControlFlowTok{except}\NormalTok{:}
-            \ControlFlowTok{continue}
     \CommentTok{# put the information in a dataframe, iters, score and the messages}
 \NormalTok{    df }\OperatorTok{=}\NormalTok{ \{}\StringTok{'iter'}\NormalTok{:[it }\ControlFlowTok{for}\NormalTok{ it }\KeywordTok{in}\NormalTok{ msg_iters.keys()],}
           \StringTok{'score'}\NormalTok{:[msg[}\DecValTok{0}\NormalTok{] }\ControlFlowTok{for}\NormalTok{ msg }\KeywordTok{in}\NormalTok{ msg_iters.values()],}
           \StringTok{'msg'}\NormalTok{:[msg[}\DecValTok{1}\NormalTok{] }\ControlFlowTok{for}\NormalTok{ msg }\KeywordTok{in}\NormalTok{ msg_iters.values()]\}}
-    \CommentTok{# return the dataframe}
+    \CommentTok{# return the dataframe in case the loop was never broken}
     \ControlFlowTok{return}\NormalTok{ pd.DataFrame(df)}
-
-\CommentTok{# we run the function}
-\NormalTok{result }\OperatorTok{=}\NormalTok{ decode(message,freq, }\DecValTok{50000}\NormalTok{)}
-\NormalTok{plt.plot(result.sort_values(}\StringTok{'score'}\NormalTok{)[}\StringTok{'score'}\NormalTok{].reset_index(drop}\OperatorTok{=}\VariableTok{True}\NormalTok{))}
-\NormalTok{plt.show()}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{./figures/unnamed-chunk-2-1.pdf}
+Our function seems to oscillate between a nearly fully decoded message
+where b is mapped to p and the opposite.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\BuiltInTok{print}\NormalTok{(result[result[}\StringTok{'score'}\NormalTok{] }\OperatorTok{==} \BuiltInTok{max}\NormalTok{(result[}\StringTok{'score'}\NormalTok{])])}
-\CommentTok{#>         iter     score                                                msg}
-\CommentTok{#> 30938  31353  1.319558  v svt vwfoc hcqfvqp hozvdo flo wqcbf mobfocp z...}
-\end{Highlighting}
-\end{Shaded}
+As a result we obtain the following decoded message (either decoding by
+hand the last few wrong letters in the cipher):
 
-\begin{verbatim}
-#> [1] "n bnq ndrsw awornoc aslnxs rzs dowfr ksfrswc ljicrwq rj nirzjwoms n ljwjcngowif gnllocs aworofz ncb nxswolnc jddolonhf aolpswsb jgsw kzolz tjgswcxscrf bwit nyywjgnh ywjlsff knf asrrsw hsnboct floscrofrf rj knwc rznr rzs bsanrs ljihb icbswxocs yiahol dnorz gnllocs cnrojcnhofx znf cj yhnls oc ljgob jw jrzsw yiahol zsnhrz xnrrswf jd thjanh fotcodolncls fnob n floscrodol nbgofsw rj rzs aworofz tjgswcxscr floscls znf nhknqf assc rzs suor frwnrstq dwjx rzof zjwwscbjif yncbsxol fsgswnh rjy aworofz hnkxnpswf zngs nhfj ocljwwslrhq lnfr rzs ljicrwqf fyhor korz rzs siwjysnc icojc nf rzs wsnfjc or nirzjwomsb n gnllocs dowfr oc dnlr awornoc wsxnocf icbsw rzs ahjlf wstihnrjwq ixawshhn ncb knf nahs rj xjgs xjws violphq aslnifs jd nc jhb hnk scnahoct or rj xnps orf jkc bsrswxocnrojcf oc yiahol zsnhrz sxswtsclosf"
-\end{verbatim}
+``\emph{a day after britain became the first western country to
+authorize a coronavirus vaccine british and american officials bickered
+over which governments drug approval process was better leading
+scientists to warn that the debate could undermine public faith vaccine
+nationalism has no place in covid or other public health matters of
+global significance said a scientific adviser to the british government
+science has always been the exit strategy from this horrendous pandemic
+several top british lawmakers have also incorrectly cast the countrys
+split with the european union as the reason it authorized a vaccine
+first in fact britain remains under the blocs regulatory umbrella and
+was able to move more quickly because of an old law enabling it to make
+its own determinations in public health emergencies}''
+
+\newpage
 
 \hypertarget{problem-2}{%
 \section{Problem 2}\label{problem-2}}
@@ -336,12 +325,28 @@ rate \(\lambda (t)\) where:
   \(N(0) = 0\)
 \item
   \(N(t)\) has independent increments
+\item
+  for any \(t \in [0, \infty)\), we have:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \(P(N(t + \Delta) - N(t) = 0) = 1 - \lambda (t) \Delta + o(\Delta)\)
+  \item
+    \(P(N(t + \Delta) - N(t) = 1) = \lambda (t) \Delta + o(\Delta)\)
+  \item
+    \(P(N(t + \Delta) - N(t) \geq 2) = o(\Delta)\)
+  \end{itemize}
 \end{itemize}
 
 We define 8:00 as \(t=0\) with the following integrable function and
 each unit of \(t\) equals to 1 hour:
 
 \(\lambda (t) = \begin{cases} 100 & 0 \leq t \leq \frac{1}{2} \\ 600t - 200 & \frac{1}{2} < t \leq \frac{3}{4} \\ 400t - 50 & \frac{3}{4} < t \leq 1 \\ -500t + 850 & 1 < t \leq 1.5 \\ \end{cases}\)
+
+We define, for all \(t > 0, N_t\) has a poisson distribution with mean:
+
+\(E(N_t) = \int_{0}^t \lambda x\,dx\)
 
 So,
 
@@ -354,21 +359,42 @@ Given that there is a limit of 150 vehicles:
 \hypertarget{b}{%
 \section{(b)}\label{b}}
 
-\includegraphics{./figures/unnamed-chunk-4-1.pdf}
-\includegraphics{./figures/unnamed-chunk-4-2.pdf}
+We are asked the time in which, with a probability of 0.8, the number of
+vehicles in the parking lot is strictly less than 150. This way, we have
+a place in the parking. This is the same as saying that we want 0.8 to
+be the probability of having 149 or less cars in the parking. The
+function \emph{ppois} in R, calculates (through the number of events and
+lambda) the probability of those events or less happening in the
+process. As we do have the probability, but are interested in finding
+lambda, what we do is try different values of lambda, until we get a
+probability equal to 0.8.
 
-Luego de hacer las pruebas para \(\lambda (t)\) obtenemos lo siguiente:
+First, we try going unit by unit. When we know that it is between 139
+and 140, we do the same but going in intervals of size 0.1. That is
+trying with values: 139.1, 139.2, and more.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{lambda =}\StringTok{ }\FloatTok{139.6}
-\NormalTok{t =}\StringTok{ }\FloatTok{0.91232}
-\CommentTok{# 8:44 AM}
-\end{Highlighting}
-\end{Shaded}
+\includegraphics{./figures/unnamed-chunk-3-1.pdf}
+\includegraphics{./figures/unnamed-chunk-3-2.pdf}
 
-Por lo que \(t = 0.91232\) horas (aproximadamente a las 8:54 de la
-mañana).
+Once we get lambda, with the expected value of events that we previously
+calculated, we tried calculating the times in the third interval.
+
+As the time tested fits within the interval we are looking for, we know
+that it is the right one.
+
+For example, if we use the first interval, the time calculated does not
+fit into its definition, and it would have been an error to consider
+this.
+
+After testing the different \(\lambda (t)\) we obtain the following:
+
+\(\lambda (t) \approx 139.6\) and \(t \approx 0.91232\)
+
+Finally, we transform the result to a time format (as it is currently a
+decimal number representing hours) \(t = 0.91232\) hours correspond
+approximately to 8:54 AM.
+
+\newpage
 
 \hypertarget{c}{%
 \section{(c)}\label{c}}
@@ -416,6 +442,11 @@ homogenous poisson process:
 
 \newpage
 
+The following code iterates over \emph{iters} amount of times the
+previously defined non-homogenous poisson process with the given
+function defining \(\lambda\) dependent on a parameter \(t\)
+(\(\lambda (t)\)).
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{simulation <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(iters, functions, lambdas, ints) \{}
@@ -453,34 +484,70 @@ homogenous poisson process:
 
 \newpage
 
+\hypertarget{d}{%
+\section{(d)}\label{d}}
+
+Running 1000 iterations of the simulation (we included the R output
+regardless because we thought it was very pretty).
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{data <-}\StringTok{ }\KeywordTok{simulation}\NormalTok{(}\DecValTok{1000}\NormalTok{, lambda_funs, lambdas, ints)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{./figures/unnamed-chunk-9-1.pdf}
+\includegraphics{./figures/unnamed-chunk-8-1.pdf}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{ratio <-}\StringTok{ }\DecValTok{0}
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(data)) \{}
-\NormalTok{    df <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(data[[i]])}
-\NormalTok{    cnt <-}\StringTok{ }\NormalTok{df }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(arrival_times }\OperatorTok{<}\StringTok{ }\FloatTok{0.91232} \OperatorTok{&}\StringTok{ }\NormalTok{events }\OperatorTok{>=}\StringTok{ }\DecValTok{150}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{count}\NormalTok{()}
-    \ControlFlowTok{if}\NormalTok{ (cnt[}\DecValTok{1}\NormalTok{] }\OperatorTok{>=}\StringTok{ }\DecValTok{1}\NormalTok{) \{}
-\NormalTok{        ratio <-}\StringTok{ }\NormalTok{ratio }\OperatorTok{+}\StringTok{ }\DecValTok{1}
-\NormalTok{    \}}
-\NormalTok{\}}
-\NormalTok{ratio}\OperatorTok{/}\DecValTok{1000}
-\CommentTok{#> [1] 0.192}
-\end{Highlighting}
-\end{Shaded}
+Proving using the 1000 simulation data that our exercise 2b is correct:
+
+\begin{verbatim}
+#> [1] 0.203
+\end{verbatim}
+
+We can see that our result approaches 0.2 very closely, which is the
+remaining probability (\(1-0.8 = 0.2\)).
 
 \hypertarget{problem-3}{%
 \section{Problem 3}\label{problem-3}}
 
 \hypertarget{a-1}{%
 \section{(a)}\label{a-1}}
+
+An M/M/c queue is a stochastic process whose state space is the set \{0,
+1, 2, 3, \ldots{}\} where the value corresponds to the number of
+customers in the system, including any currently in service. (n.d.)
+
+Arrivals occur at rate \(\lambda\) according to a Poisson process and
+move the process from state \emph{i} to \emph{i+1}.
+
+Service times have an exponential distribution with parameter \(\mu\).
+If there are fewer than 2 jobs, some of the servers will be free. If
+there are more than 2 jobs, the jobs queue in a buffer.
+
+The buffer is of infinite size, so there is no limit on the number of
+customers it can contain.
+
+In this case, the model describes a queue with two single servers which
+serves customers in the order in which they arrive. Customer arrivals
+constitute a Poisson process of rate \(\lambda\).
+
+This means that the number of customers arriving during a time period
+{[}t, t+s{]} is a Poisson random variable with mean \(\lambda\), and it
+is independent of the past of the arrival process. Also, the
+inter-arrival times (between the arrival of one customer and the next)
+are identically distributed exponential random variables with parameter
+\(\lambda\) and mean \(\frac{1}{\lambda}\). In other words, the arrival
+process is Markovian, and this is what the first M in M/M/2 stands for.
+
+The second M of this process name says that the service process is
+Markovian. Customer service times are exponentially distributed, with
+parameter \(\mu\) and mean \(\frac{1}{\mu}\), and the service times of
+different customers are mutually independent. By the memoryless property
+of the exponential distribution, knowing how much service a customer has
+already received gives us no information about how much more service it
+requires. When a customer has been served, it departs from the queue.
+Also, in time 0, there are no costumers. So we see it fullfills all the
+conditions of a Markov Chain. (Ganesh 2012)
 
 Our infinitesimal generator is the following:
 
@@ -511,6 +578,8 @@ Then multiplying \(\frac{2}{2}\) to the summation:
 
 = \(\pi_0 (2 \sum_{i=0}^{\infty} (\frac{\lambda}{2 \mu})^{i} - 1)\)
 
+Knowing that this infite sum corresponds to a geometric series:
+
 \(\pi_0 (2 (\frac{1}{1 - \frac{\lambda}{2 \mu}}) - 1) = 1\)
 
 \(\pi_0 = \frac{1}{2 (\frac{1}{1 - \frac{\lambda}{2 \mu}}) - 1}\)
@@ -526,7 +595,8 @@ finally:
 The infinite sum converges when \(|\frac{\lambda}{2 \mu}| < 1\) in which
 case the stationary distribution P exists.
 
-Then:
+We can obtain Littles formula by finding the expectation with respect to
+the stationary distribution:
 
 \(L = \sum_{n=0}^{\infty} \pi_n * n\)
 
@@ -572,7 +642,7 @@ the following:
 Actually, in general:
 
 \(P(N^{OV} = k | N^{PR} = n) = \frac{1}{n+1}\), \(n \leq c - 1\),
-\(x = 0,1\)
+\(k = 0,1\)
 
 As in this case c=2, our \emph{l} subject can' t overtake more than one
 customer.
@@ -616,8 +686,8 @@ So then we get:
 
 \(P(N^{OV} = k) = \frac{\lambda}{2 \mu + \lambda}\), \(k = c-1 = 1\)
 
-\hypertarget{d}{%
-\section{(d)}\label{d}}
+\hypertarget{d-1}{%
+\section{(d)}\label{d-1}}
 
 We define the following function to simulate the queueing system:
 
@@ -687,17 +757,21 @@ We define the following function to simulate the queueing system:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{./figures/unnamed-chunk-12-1.pdf}
+\includegraphics{./figures/unnamed-chunk-11-1.pdf}
+
+\newpage
 
 \hypertarget{e}{%
 \section{(e)}\label{e}}
 
-We define the following function to calculate the overtaking
-probability:
+\hypertarget{we-define-the-following-function-to-calculate-the-overtaking-probability}{%
+\subsection{1 - We define the following function to calculate the
+overtaking
+probability:}\label{we-define-the-following-function-to-calculate-the-overtaking-probability}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{d <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(customers, queue, ExitTimes) \{}
+\NormalTok{overtaking_prob <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(customers, queue, ExitTimes) \{}
   \CommentTok{# This function generates a M/M/2 queue system and returns }
   \CommentTok{# the probability of overtaking}
   \CommentTok{# PARAMS:}
@@ -721,39 +795,67 @@ probability:
 \end{Highlighting}
 \end{Shaded}
 
-Write theRcode necessary to simulate the system (provide the code) and
-generate thetimes customers leave the supermarket
+Using the previous function to calculate the overtaking probability of
+our simulation:
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{avgs <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# general average of multiple simulations}
-\NormalTok{number_of_customers <-}\StringTok{ }\DecValTok{8500} \CommentTok{# simulations done with 8500 people}
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
-\NormalTok{    times <-}\StringTok{ }\KeywordTok{q}\NormalTok{(number_of_customers, }\DataTypeTok{l=}\FloatTok{0.4}\NormalTok{, }\DataTypeTok{m=}\FloatTok{0.25}\NormalTok{) }\CommentTok{# running the simulation}
-\NormalTok{    avg <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# estimation (usually includes an extra person)}
-\NormalTok{    avg_p <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# pessimistic estimation (usually excludes that extra person)}
-    \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{0}\OperatorTok{:}\DecValTok{99}\NormalTok{) \{}
-        \CommentTok{# assuming the person number number_of_customers - i is the last one}
-\NormalTok{        last_arrival_time <-}\StringTok{ }\NormalTok{times}\OperatorTok{$}\NormalTok{arrival[}\KeywordTok{length}\NormalTok{(times}\OperatorTok{$}\NormalTok{arrival)}\OperatorTok{-}\NormalTok{i] }
-        \CommentTok{# checking all exit times mayores al arrival time of the person number number_of_customers - i}
-\NormalTok{        val <-}\StringTok{ }\KeywordTok{sum}\NormalTok{(times}\OperatorTok{$}\NormalTok{exit[}\DecValTok{1}\OperatorTok{:}\NormalTok{(}\KeywordTok{length}\NormalTok{(times}\OperatorTok{$}\NormalTok{arrival)}\OperatorTok{-}\NormalTok{i}\DecValTok{-1}\NormalTok{)] }\OperatorTok{>}\StringTok{ }\NormalTok{last_arrival_time) }
-\NormalTok{        avg <-}\StringTok{ }\KeywordTok{c}\NormalTok{(avg,val)}
-\NormalTok{        avg_p <-}\StringTok{ }\KeywordTok{c}\NormalTok{(avg,val}\DecValTok{-1}\NormalTok{)}
-\NormalTok{    \}}
-    \CommentTok{# joining all estimations }
-\NormalTok{    total_avg <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{c}\NormalTok{(avg,avg_p))}
-    \CommentTok{# adding to vector with  all averages}
-\NormalTok{    avgs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(avgs, total_avg) }
-\NormalTok{\}}
-\CommentTok{# printing averages}
-\NormalTok{avgs}
-\CommentTok{#>  [1]  2.278607  4.228856  2.636816 11.771144  2.064677  3.621891  2.696517}
-\CommentTok{#>  [8]  5.905473  2.179104 10.149254}
-\CommentTok{# calculating the average of averages}
-\KeywordTok{mean}\NormalTok{(avgs) }
-\CommentTok{#> [1] 4.753234}
-\end{Highlighting}
-\end{Shaded}
+\begin{verbatim}
+#> [1] 0.4528
+\end{verbatim}
+
+We obtain an overtaking probability of \(\approx 0.44\).
+
+To compare, we calculate the overtaking probability by hand:
+
+\(P(N^{OV}) = \frac{\lambda}{2 \mu + \lambda} = \frac{0.4}{2 * 0.25 + 0.4} = 0. \bar{4}\)
+
+\newpage
+
+\hypertarget{estimating-the-long-run-average-of-people-in-the-system-and-comparing-the-result-with-part-b}{%
+\subsection{2- Estimating the long-run average of people in the system
+and comparing the result with part
+(b)}\label{estimating-the-long-run-average-of-people-in-the-system-and-comparing-the-result-with-part-b}}
+
+We first do so by simulating:
+
+Our methodology is the following:
+
+1 - We simulate 10 times using our simulation function for this
+exercises with 8500 customers
+
+2 - We create an empty averages vector
+
+3 - Within the loop we iteratively create vectors in order to add (to
+them) the number of customers in the system by assuming that the
+customer being iterated by is the last one - if we have 8500 customers,
+we take the last 100 customers and we assume that the 8400 is the last
+one, then we assume the 8401 is the last one and so on.
+
+4 - We continue doing this until we have a vector of 100 counts of
+customers in the system. - While in the loop, we will create a vector
+with the exact count and the count minus one, so we have 2 vectors of
+counts, one with a pessimistic count (excluding the current customer
+that just came in) and one with an optimistic count (including the
+customer that just came in)
+
+5 - We keep doing this until we have about 10 vectors (as we do 10
+simulations) of 100 averaged vectors (optimistic and pessimistic counts
+of customers averaged per simulation) and we calculate the average of
+all the averages.
+
+6 - We obtain the long-run average amount of customers in the system
+
+\begin{verbatim}
+#>  [1]  3.616915  9.726368  2.412935 11.537313  3.497512  2.965174  5.592040
+#>  [8]  4.835821 33.965174  1.437811
+#> [1] 7.958706
+\end{verbatim}
+
+Note: Given that this is a random process, different runs of the
+function we defined to do such simulation can yield different results.
+However, we found our results to be between 3 and 6.
+
+Despite this, our most consistent results are around \textbf{4.4} and
+\textbf{4.5}.
 
 Calculation by hand:
 
@@ -770,8 +872,19 @@ Calculation by hand:
 
 \(\frac{\lambda}{2 \mu} = \frac{0.4}{2(0.25)} = 0.8\)
 
-\(\pi_0 = \frac{1}{2(\frac{1}{1-0.8}) - 1} = \frac{1}{9} = \approx 0. \bar{1}\)
+\(\pi_0 = \frac{1}{2(\frac{1}{1-0.8}) - 1} = \frac{1}{9} = 0. \bar{1} \approx 0.11\)
 
-\(L = \pi_0 (1 + 2 \frac{0.8}{(1-0.8)^2}) = 4. \bar{5}\)
+\(L = \pi_0 (1 + 2 \frac{0.8}{(1-0.8)^2}) = 4. \bar{5} \approx 4.56\)
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-qm1}{}%
+Ganesh, Ayalvadi, Ph.D. 2012. ``Simple Queueing Models.''
+
+\leavevmode\hypertarget{ref-wiki1}{}%
+n.d. ``M/M/c Queue.''
 
 \end{document}

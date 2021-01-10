@@ -1,0 +1,26 @@
+[{
+    "id":"qm1",
+    "title":"Simple queueing models",
+    "type":"article",
+    "language":"en",
+    "author":[{
+        "family":"Ganesh",
+        "given":"Ayalvadi",
+        "suffix":"Ph.D."
+    }],
+    "university":"University of Bristol",
+    "issued": { "date-parts": [ [ "2012" ] ] },
+    "url":"https://people.maths.bris.ac.uk/~maajg/teaching/iqn/queues.pdf"
+},
+{
+    "id":"wiki1",
+    "title":"M/M/c queue",
+    "type":"article",
+    "section":"Model definition",
+    "language":"en",
+    "author":[{
+        "name":"English Wikipedia"
+    }],
+    "last modified": { "date-parts": [ [ "2020" ] ] },
+    "url":"https://en.wikipedia.org/wiki/M/M/c_queue#Model_definition"
+}]

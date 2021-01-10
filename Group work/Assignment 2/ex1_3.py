@@ -75,7 +75,7 @@ def decode(message, freqs, iters):
     def score(fun):
         p = 0
         for i in range(1,len(msg)):
-            p = p + freq[f_map(fun(msg[i-1])),f_map(fun(msg[i]))]
+            p = p + freqs[f_map(fun(msg[i-1])),f_map(fun(msg[i]))]
         return p
     
     # converting the message to a list in order to
@@ -108,9 +108,9 @@ def decode(message, freqs, iters):
         # calculating the score for each function and its ratio
         scr_f = score(f)
         scr_fn = score(f_n)
-        a = scr_fn/scr_f
+        a = np.exp(scr_fn - scr_f)
         # test if a random number is lower than min(a, 1)
-        cond = np.random.rand() <= min(a,1)
+        cond = np.random.rand() < min(a,1)
         # if condition is true
         if cond:
             # replacing the letters list with the one from f*
@@ -128,29 +128,28 @@ def decode(message, freqs, iters):
             # adding score and joining the message to the dictionary
             # to then transform into a dataframe
             msg_iters[i] = (a,''.join([x for x in msg]))
+
+            # we separate the message by words
+            msg_list = msg_iters[i][1].split(' ')
+            # we test 5 random words to see if they are actually words 
+            # present in the word corpus
+            conds = [np.random.choice(msg_list) in words.words() for x in range(5)]
+            # we break the loop if the 5 true words are found
+            if False not in conds:
+                print(f'found at iteration: {i}')
+                print(msg_iters[i])
+                break
         # if condition is false
         else:
+            # resetting the letters after a failed score comparison
+            letters_n = deepcopy(letters)
             # apply the f function to the message instead
             for k in range(len(msg)):
                 msg[k] = f(msg[k])
+        
         # reset the message
         msg = list(message)
 
-        # break the loop if 2 words are found in the english language corpus
-        try:
-            msg_list = msg_iters[i].split(' ')
-            fw = {'w1':np.random.choice(msg_list),
-                  'w2':np.random.choice(msg_list)}
-            conds = {w_n:(w in words.words()) for w_n,w in fw.items()}
-            vals = list(conds.values())
-            if False not in vals:
-                print(f'found at iteration: {i}')
-                print(msg_iters[i])
-                print(f'words found: {list(conds.keys())}')
-                break
-        # otherwise continue
-        except:
-            continue
     # put the information in a dataframe, iters, score and the messages
     df = {'iter':[it for it in msg_iters.keys()],
           'score':[msg[0] for msg in msg_iters.values()],
@@ -158,6 +157,4 @@ def decode(message, freqs, iters):
     # return the dataframe
     return pd.DataFrame(df)
 
-result = decode(message,freq, 200000)
-plt.plot(result.sort_values('score')['score'].reset_index(drop=True))
-print(result[result['score'] == max(result['score'])])
+result = decode(message,freq, 50000)
