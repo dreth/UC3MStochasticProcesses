@@ -1,7 +1,7 @@
 ---
 title: 'Stochastic Processes: Assignment 1'
 author: "Group 1: Javier Esteban Aragoneses, Mauricio Marcos Fajgenbaun, Danyu Zhang, Daniel Alonso"
-date: "November 27th, 2020"
+date: "January 10th, 2020"
 output: 'pdf_document'
 ---
 
@@ -191,6 +191,7 @@ def decode(message, freqs, iters):
     # return the dataframe
     return pd.DataFrame(df)
 
+# we run the function
 result = decode(message,freq, 50000)
 plt.plot(result.sort_values('score')['score'].reset_index(drop=True))
 plt.show()
@@ -652,17 +653,6 @@ times <- q(number_of_customers, l=0.4, m=0.25)
 plot(times$exit)
 ```
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
-last_arrival_time <- times$arrival[length(times$arrival)]
-sum(times$exit > last_arrival_time)
-```
-
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
-nb.pe=numeric(length=length(t))
-for (i in 1:length(times$service)){
-  nb.pe[i]=length(which(times$arrival<times$service[i]&times$exit>times$service[i]))
-}
-```
 
 # (e)
 
@@ -691,3 +681,49 @@ d <- function(customers, queue, ExitTimes) {
   return(ot_prob)
 }
 ```
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+avgs <- c()
+number_of_customers <- 8500
+for (i in 1:10){
+    times <- q(number_of_customers, l=0.4, m=0.25) 
+    avg <- c()
+    for (i in 0:9) {
+        last_arrival_time <- times$arrival[length(times$arrival)-i]
+        avg <- c(avg,sum(times$exit[1:(length(times$arrival)-i-1)] > last_arrival_time) - 1)
+    }
+    avgs <- c(avgs, avg)
+}
+avgs
+mean(avgs)
+```
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+avgs <- c()
+number_of_customers <- 8500
+for (i in 1:100){
+    times <- q(number_of_customers, l=0.4, m=0.25) 
+    nb.pe=numeric(length=length(t))
+    for (i in 1:length(times$service)){
+        nb.pe[i]=length(which(times$arrival<times$exit[i]))
+    }
+    avgs <- c(avgs, mean(nb.pe))
+}
+avgs
+mean(avgs)
+```
+
+Calculation by hand:
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+lambda <- 0.4
+mu <- 0.25
+lambda2mu <- lambda/(2*mu)
+
+pi_0 <- 1/(2*(1/(1-lambda2mu)) - 1)
+L <- pi_0 * (1 + 2*(lambda2mu/((1-lambda2mu)^2)))
+```
+
+$\frac{\lambda}{2 \mu} = \frac{0.4}{2(0.25)} = 0.8$
+
+$\pi_0 = \frac{1}{}
