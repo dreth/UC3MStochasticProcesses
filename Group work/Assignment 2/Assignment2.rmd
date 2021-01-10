@@ -437,7 +437,7 @@ We can see that our result approaches 0.2 very closely, which is the remaining p
 
 # (a)
 
-An M/M/c queue is a stochastic process whose state space is the set {0, 1, 2, 3, ...} where the value corresponds to the number of customers in the system, including any currently in service. [@wiki1]
+An M/M/c queue is a stochastic process whose state space is the set {0, 1, 2, 3, ...} where the value corresponds to the number of customers in the system, including any currently in service. (Wikipedia: M/M/c queue)
 
 Arrivals occur at rate $\lambda$ according to a Poisson process and move the process from state *i* to *i+1*.
 
@@ -534,6 +534,8 @@ $L = \pi_0 [1 + 2 \sum_{n=0}^{\infty} (\frac{\lambda}{2 \mu})^n * n]$
 
 $L = \pi_0 [1 + 2 \frac{\frac{\lambda}{2 \mu}}{(1 - \frac{\lambda}{2 \mu})^2}]$
 
+\newpage
+
 # (c)
 
 Let's consider the probabilities conditioned on the number of customers in the system that are present once our specific subject *l* gets into the system.
@@ -586,9 +588,13 @@ So then we get:
 
 $P(N^{OV} = k) = \frac{\lambda}{2 \mu + \lambda}$, $k = c-1 = 1$
 
+\newpage
+
 # (d)
 
 We define the following function to simulate the queueing system:
+
+All the considerations and methodology are explained within the code in comments.
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 # Simulation of the System (M/M/2)
@@ -606,38 +612,31 @@ q <- function(customers, l, m) {
 
   # interval for arrival times
   exp_at <- rexp(customers,l)
-  
   # we have as many arrival times as the number of customers
   ArrivalTimes <- rep(0,customers) 
-
   ArrivalTimes[1] <- exp_at[1]
   for (i in 2:customers) {
     # arrival time = the previous arrival time + the interval between 2 customers
     ArrivalTimes[i] <- ArrivalTimes[i-1] + exp_at[i]
   } 
-  
   # service time distributed according to mu
   ServiceTimes <- rexp(customers, m)
-  
   # we have as many exit times as the number of customers
   ExitTimes <- rep(0,customers)
-  
   # the first two exit time is equal to the service time due to we have 2 cashiers
   ExitTimes[1:2] <- ServiceTimes[1:2]
   for (i in 3:customers) {
     # we sort exit time from larger to smaller
     SortedTimes <- sort(ExitTimes[1:(i-1)], decreasing=T)
-    
     # all of the two cashiers are occupied, then the new customer will have to 
     # wait until at least one of them leaves the supermarket (the faster one)
-    # then the exit time of the new customer is exited time of the previous faster customer plus 
-    # the service time of this new customer
+    # then the exit time of the new customer is exited time of the 
+    # previous faster customer plus the service time of this new customer
     if (ArrivalTimes[i] < SortedTimes[2]) {ExitTimes[i] <- SortedTimes[2] + ServiceTimes[i]}
-    
-    # one or two cashiers are free, then the exit time is the arrival time plus the service time
+    # one or two cashiers are free, then the exit time is the arrival time
+    # plus the service time
     else {ExitTimes[i] <- ArrivalTimes[i] + ServiceTimes[i]}
   }
-  
   # create a matrix and return it
   times <- data.frame(arrival=ArrivalTimes,
                       exit=ExitTimes,
@@ -646,10 +645,22 @@ q <- function(customers, l, m) {
 }
 ```
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+\newpage
+
+The simulation uses the following params:
+
+- number of customers = 8500
+- $\lambda = 0.4$
+- $\mu = 0.25$
+
+We plot the cumulative sum of our exit and arrival times of our simulation:
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=10}
 number_of_customers <- 8500
 times <- q(number_of_customers, l=0.4, m=0.25) 
-plot(times$exit)
+par(mfrow=c(2,1))
+plot(times$exit, main="exit times")
+plot(times$arrival, main="arrival times")
 ```
 
 \newpage
@@ -657,6 +668,7 @@ plot(times$exit)
 # (e)
 
 ## 1 - We define the following function to calculate the overtaking probability:
+
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 overtaking_prob <- function(customers, queue, ExitTimes) {
@@ -670,12 +682,12 @@ overtaking_prob <- function(customers, queue, ExitTimes) {
   # we define the number of people of overtaking
   ot <- 0
   for (i in queue:(customers - queue)) {
-
     # the number of people overtaking of all customers is the previous 
     # number plus 1 if the exit time of the i-th customer is smaller (earlier) 
     # than the (i-1)th customer 
     ot <- ot + sum(ExitTimes[i] < ExitTimes[1:(i-1)])
   }
+  # we then calculate the probability
   r <- customers-2*queue
   ot_prob <- ot/r
   return(ot_prob)
@@ -726,7 +738,8 @@ for (i in 1:10) {
     for (i in 0:99) {
         # assuming the person number number_of_customers - i is the last one
         last_arrival_time <- times$arrival[length(times$arrival)-i] 
-        # checking all exit times mayores al arrival time of the person number number_of_customers - i
+        # checking all exit times mayores al arrival time 
+        # of the person number number_of_customers - i
         val <- sum(times$exit[1:(length(times$arrival)-i-1)] > last_arrival_time) 
         avg <- c(avg,val)
         avg_p <- c(avg,val-1)
@@ -748,7 +761,7 @@ Despite this, our most consistent results are around **4.4** and **4.5**.
 
 Calculation by hand:
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 lambda <- 0.4
 mu <- 0.25
 lambda2mu <- lambda/(2*mu)

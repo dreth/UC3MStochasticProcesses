@@ -6,11 +6,11 @@
     "author":[{
         "family":"Ganesh",
         "given":"Ayalvadi",
-        "suffix":"Ph.D."
+        "suffix":"Ph.D.",
+        "uri":"https://people.maths.bris.ac.uk/~maajg/teaching/iqn/queues.pdf"
     }],
-    "university":"University of Bristol",
-    "issued": { "date-parts": [ [ "2012" ] ] },
-    "url":"https://people.maths.bris.ac.uk/~maajg/teaching/iqn/queues.pdf"
+    "institution":"University of Bristol",
+    "issued": { "date-parts": [ [ "2012" ] ] }
 },
 {
     "id":"wiki1",
@@ -18,9 +18,10 @@
     "type":"article",
     "section":"Model definition",
     "language":"en",
+    "publisher":"English Wikipedia",
     "author":[{
-        "given":"English Wikipedia"
+        "name":"Wikipedia",
+         "uri":"https://en.wikipedia.org/wiki/M/M/c_queue#Model_definition"
     }],
-    "last modified": { "date-parts": [ [ "2020" ] ] },
-    "url":"https://en.wikipedia.org/wiki/M/M/c_queue#Model_definition"
+    "last modified": { "date-parts": [ [ "2020" ] ] }
 }]

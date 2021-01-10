@@ -520,7 +520,7 @@ regardless because we thought it was very pretty).
 Proving using the 1000 simulation data that our exercise 2b is correct:
 
 \begin{verbatim}
-#> [1] 0.164
+#> [1] 0.194
 \end{verbatim}
 
 We can see that our result approaches 0.2 very closely, which is the
@@ -534,7 +534,8 @@ remaining probability (\(1-0.8 = 0.2\)).
 
 An M/M/c queue is a stochastic process whose state space is the set \{0,
 1, 2, 3, \ldots{}\} where the value corresponds to the number of
-customers in the system, including any currently in service. (n.d.)
+customers in the system, including any currently in service. (Wikipedia:
+M/M/c queue)
 
 Arrivals occur at rate \(\lambda\) according to a Poisson process and
 move the process from state \emph{i} to \emph{i+1}.
@@ -635,6 +636,8 @@ We get the following:
 
 \(L = \pi_0 [1 + 2 \frac{\frac{\lambda}{2 \mu}}{(1 - \frac{\lambda}{2 \mu})^2}]\)
 
+\newpage
+
 \hypertarget{c-1}{%
 \section{(c)}\label{c-1}}
 
@@ -705,10 +708,15 @@ So then we get:
 
 \(P(N^{OV} = k) = \frac{\lambda}{2 \mu + \lambda}\), \(k = c-1 = 1\)
 
+\newpage
+
 \hypertarget{d-1}{%
 \section{(d)}\label{d-1}}
 
 We define the following function to simulate the queueing system:
+
+All the considerations and methodology are explained within the code in
+comments.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -727,38 +735,31 @@ We define the following function to simulate the queueing system:
 
   \CommentTok{# interval for arrival times}
 \NormalTok{  exp_at <-}\StringTok{ }\KeywordTok{rexp}\NormalTok{(customers,l)}
-  
   \CommentTok{# we have as many arrival times as the number of customers}
 \NormalTok{  ArrivalTimes <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,customers) }
-
 \NormalTok{  ArrivalTimes[}\DecValTok{1}\NormalTok{] <-}\StringTok{ }\NormalTok{exp_at[}\DecValTok{1}\NormalTok{]}
   \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{2}\OperatorTok{:}\NormalTok{customers) \{}
     \CommentTok{# arrival time = the previous arrival time + the interval between 2 customers}
 \NormalTok{    ArrivalTimes[i] <-}\StringTok{ }\NormalTok{ArrivalTimes[i}\DecValTok{-1}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{exp_at[i]}
 \NormalTok{  \} }
-  
   \CommentTok{# service time distributed according to mu}
 \NormalTok{  ServiceTimes <-}\StringTok{ }\KeywordTok{rexp}\NormalTok{(customers, m)}
-  
   \CommentTok{# we have as many exit times as the number of customers}
 \NormalTok{  ExitTimes <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,customers)}
-  
   \CommentTok{# the first two exit time is equal to the service time due to we have 2 cashiers}
 \NormalTok{  ExitTimes[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{] <-}\StringTok{ }\NormalTok{ServiceTimes[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{]}
   \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{3}\OperatorTok{:}\NormalTok{customers) \{}
     \CommentTok{# we sort exit time from larger to smaller}
 \NormalTok{    SortedTimes <-}\StringTok{ }\KeywordTok{sort}\NormalTok{(ExitTimes[}\DecValTok{1}\OperatorTok{:}\NormalTok{(i}\DecValTok{-1}\NormalTok{)], }\DataTypeTok{decreasing=}\NormalTok{T)}
-    
     \CommentTok{# all of the two cashiers are occupied, then the new customer will have to }
     \CommentTok{# wait until at least one of them leaves the supermarket (the faster one)}
-    \CommentTok{# then the exit time of the new customer is exited time of the previous faster customer plus }
-    \CommentTok{# the service time of this new customer}
+    \CommentTok{# then the exit time of the new customer is exited time of the }
+    \CommentTok{# previous faster customer plus the service time of this new customer}
     \ControlFlowTok{if}\NormalTok{ (ArrivalTimes[i] }\OperatorTok{<}\StringTok{ }\NormalTok{SortedTimes[}\DecValTok{2}\NormalTok{]) \{ExitTimes[i] <-}\StringTok{ }\NormalTok{SortedTimes[}\DecValTok{2}\NormalTok{] }\OperatorTok{+}\StringTok{ }\NormalTok{ServiceTimes[i]\}}
-    
-    \CommentTok{# one or two cashiers are free, then the exit time is the arrival time plus the service time}
+    \CommentTok{# one or two cashiers are free, then the exit time is the arrival time}
+    \CommentTok{# plus the service time}
     \ControlFlowTok{else}\NormalTok{ \{ExitTimes[i] <-}\StringTok{ }\NormalTok{ArrivalTimes[i] }\OperatorTok{+}\StringTok{ }\NormalTok{ServiceTimes[i]\}}
 \NormalTok{  \}}
-  
   \CommentTok{# create a matrix and return it}
 \NormalTok{  times <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{arrival=}\NormalTok{ArrivalTimes,}
                       \DataTypeTok{exit=}\NormalTok{ExitTimes,}
@@ -768,13 +769,22 @@ We define the following function to simulate the queueing system:
 \end{Highlighting}
 \end{Shaded}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{number_of_customers <-}\StringTok{ }\DecValTok{8500}
-\NormalTok{times <-}\StringTok{ }\KeywordTok{q}\NormalTok{(number_of_customers, }\DataTypeTok{l=}\FloatTok{0.4}\NormalTok{, }\DataTypeTok{m=}\FloatTok{0.25}\NormalTok{) }
-\KeywordTok{plot}\NormalTok{(times}\OperatorTok{$}\NormalTok{exit)}
-\end{Highlighting}
-\end{Shaded}
+\newpage
+
+The simulation uses the following params:
+
+\begin{itemize}
+\tightlist
+\item
+  number of customers = 8500
+\item
+  \(\lambda = 0.4\)
+\item
+  \(\mu = 0.25\)
+\end{itemize}
+
+We plot the cumulative sum of our exit and arrival times of our
+simulation:
 
 \includegraphics{./figures/unnamed-chunk-11-1.pdf}
 
@@ -801,12 +811,12 @@ probability:}\label{we-define-the-following-function-to-calculate-the-overtaking
   \CommentTok{# we define the number of people of overtaking}
 \NormalTok{  ot <-}\StringTok{ }\DecValTok{0}
   \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in}\NormalTok{ queue}\OperatorTok{:}\NormalTok{(customers }\OperatorTok{-}\StringTok{ }\NormalTok{queue)) \{}
-
     \CommentTok{# the number of people overtaking of all customers is the previous }
     \CommentTok{# number plus 1 if the exit time of the i-th customer is smaller (earlier) }
     \CommentTok{# than the (i-1)th customer }
 \NormalTok{    ot <-}\StringTok{ }\NormalTok{ot }\OperatorTok{+}\StringTok{ }\KeywordTok{sum}\NormalTok{(ExitTimes[i] }\OperatorTok{<}\StringTok{ }\NormalTok{ExitTimes[}\DecValTok{1}\OperatorTok{:}\NormalTok{(i}\DecValTok{-1}\NormalTok{)])}
 \NormalTok{  \}}
+  \CommentTok{# we then calculate the probability}
 \NormalTok{  r <-}\StringTok{ }\NormalTok{customers}\DecValTok{-2}\OperatorTok{*}\NormalTok{queue}
 \NormalTok{  ot_prob <-}\StringTok{ }\NormalTok{ot}\OperatorTok{/}\NormalTok{r}
   \KeywordTok{return}\NormalTok{(ot_prob)}
@@ -818,7 +828,7 @@ Using the previous function to calculate the overtaking probability of
 our simulation:
 
 \begin{verbatim}
-#> [1] 0.444
+#> [1] 0.4442667
 \end{verbatim}
 
 We obtain an overtaking probability of \(\approx 0.44\).
@@ -864,9 +874,9 @@ all the averages.
 6 - We obtain the long-run average amount of customers in the system
 
 \begin{verbatim}
-#>  [1] 5.014925 1.417910 2.666667 4.149254 3.333333 4.144279 5.283582 8.567164
-#>  [9] 2.825871 4.731343
-#> [1] 4.213433
+#>  [1] 2.074627 4.845771 5.024876 4.686567 3.268657 1.925373 2.393035 4.154229
+#>  [9] 4.000000 2.238806
+#> [1] 3.461194
 \end{verbatim}
 
 Note: Given that this is a random process, different runs of the
@@ -877,17 +887,6 @@ Despite this, our most consistent results are around \textbf{4.4} and
 \textbf{4.5}.
 
 Calculation by hand:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{lambda <-}\StringTok{ }\FloatTok{0.4}
-\NormalTok{mu <-}\StringTok{ }\FloatTok{0.25}
-\NormalTok{lambda2mu <-}\StringTok{ }\NormalTok{lambda}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{mu)}
-
-\NormalTok{pi_}\DecValTok{0}\NormalTok{ <-}\StringTok{ }\DecValTok{1}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{lambda2mu)) }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)}
-\NormalTok{L <-}\StringTok{ }\NormalTok{pi_}\DecValTok{0} \OperatorTok{*}\StringTok{ }\NormalTok{(}\DecValTok{1} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{(lambda2mu}\OperatorTok{/}\NormalTok{((}\DecValTok{1}\OperatorTok{-}\NormalTok{lambda2mu)}\OperatorTok{^}\DecValTok{2}\NormalTok{)))}
-\end{Highlighting}
-\end{Shaded}
 
 \(\frac{\lambda}{2 \mu} = \frac{0.4}{2(0.25)} = 0.8\)
 
@@ -900,9 +899,6 @@ Calculation by hand:
 \addcontentsline{toc}{section}{References}
 
 \hypertarget{refs}{}
-\leavevmode\hypertarget{ref-wiki1}{}%
-, English Wikipedia. n.d. ``M/M/c Queue.''
-
 \leavevmode\hypertarget{ref-qm1}{}%
 Ganesh, Ayalvadi, Ph.D. 2012. ``Simple Queueing Models.''
 
