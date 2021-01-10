@@ -145,17 +145,23 @@ corresponding block or line(s) of code.
 \NormalTok{    message }\OperatorTok{=}\NormalTok{ f.readlines()[}\DecValTok{0}\NormalTok{].replace(}\StringTok{'}\CharTok{\textbackslash{}n}\StringTok{'}\NormalTok{,}\StringTok{''}\NormalTok{)}
 
 \CommentTok{# decode function}
-\KeywordTok{def}\NormalTok{ decode(message, freqs, iters):}
+\KeywordTok{def}\NormalTok{ decode(message, freqs, iters, check_words}\OperatorTok{=}\VariableTok{True}\NormalTok{):}
     \CommentTok{"""}
 \CommentTok{    Function to decode a message enconded }
 \CommentTok{    using a substitution cipher utilizing the}
 \CommentTok{    Metropolis-Hastings algorithm.}
 
 \CommentTok{    Params:}
-\CommentTok{    message = string to decode}
-\CommentTok{    freqs = frequency table for transitions of letters}
-\CommentTok{            to input}
-\CommentTok{    iters = amount of iterations to perform}
+\CommentTok{    message =     string to decode}
+\CommentTok{    freqs =       frequency table for transitions of letters}
+\CommentTok{                  to input}
+\CommentTok{    iters =       amount of iterations to perform}
+\CommentTok{    check_words = if true the loop will be broken if 5 words}
+\CommentTok{                  in the message are found to be in the english}
+\CommentTok{                  language corpus, if false then the function will}
+\CommentTok{                  print the message after the condition where}
+\CommentTok{                  min(a(f*,f), 1) > random uniformly distributed number between}
+\CommentTok{                  0 and 1}
 \CommentTok{    """}
     \CommentTok{# dictionary to organize the iterations}
     \CommentTok{# the score and the result of the attempt}
@@ -257,12 +263,20 @@ corresponding block or line(s) of code.
             \CommentTok{# we test 5 random words to see if they are actually words }
             \CommentTok{# present in the word corpus}
 \NormalTok{            conds }\OperatorTok{=}\NormalTok{ [np.random.choice(msg_list) }\KeywordTok{in}\NormalTok{ words.words() }\ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{5}\NormalTok{)]}
-            \CommentTok{# we break the loop if the 5 true words are found}
-            \ControlFlowTok{if} \VariableTok{False} \KeywordTok{not} \KeywordTok{in}\NormalTok{ conds:}
-                \BuiltInTok{print}\NormalTok{(}\StringTok{'Cipher used:}\CharTok{\textbackslash{}n}\StringTok{'}\NormalTok{)}
-                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'}\SpecialCharTok{\{cd\}}\SpecialStringTok{'}\NormalTok{)}
-                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'}\CharTok{\textbackslash{}n}\SpecialStringTok{found at iteration: }\SpecialCharTok{\{i\}}\CharTok{\textbackslash{}n}\SpecialStringTok{Message (may contain wrong letters):'}\NormalTok{)}
-                \ControlFlowTok{return}\NormalTok{ msg_iters[i]}
+            \CommentTok{# if check words == True}
+            \ControlFlowTok{if}\NormalTok{ check_words }\OperatorTok{==} \VariableTok{True}\NormalTok{:}
+                \CommentTok{# we break the loop if the 5 true words are found}
+                \ControlFlowTok{if} \VariableTok{False} \KeywordTok{not} \KeywordTok{in}\NormalTok{ conds:}
+                    \BuiltInTok{print}\NormalTok{(}\StringTok{'Cipher used:}\CharTok{\textbackslash{}n}\StringTok{'}\NormalTok{)}
+                    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'}\SpecialCharTok{\{cd\}}\SpecialStringTok{'}\NormalTok{)}
+                    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'}\CharTok{\textbackslash{}n}\SpecialStringTok{found at iteration: }\SpecialCharTok{\{i\}}\CharTok{\textbackslash{}n}\SpecialStringTok{Message (may contain wrong letters):'}\NormalTok{)}
+                    \ControlFlowTok{return}\NormalTok{ msg_iters[i]}
+            \CommentTok{# otherwise}
+            \ControlFlowTok{else}\NormalTok{:}
+                \CommentTok{# we print the iteration number and message only }
+                \CommentTok{# when the cipher changes}
+                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'iteration #}\SpecialCharTok{\{i\}}\SpecialStringTok{:}\CharTok{\textbackslash{}n}\SpecialStringTok{'}\NormalTok{)}
+                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f'}\SpecialCharTok{\{}\NormalTok{msg_iters[i][}\DecValTok{1}\NormalTok{]}\SpecialCharTok{\}}\CharTok{\textbackslash{}n}\SpecialStringTok{'}\NormalTok{)}
         \CommentTok{# if condition is false}
         \ControlFlowTok{else}\NormalTok{:}
             \CommentTok{# resetting the letters after a failed score comparison}
@@ -284,7 +298,8 @@ corresponding block or line(s) of code.
 \end{Shaded}
 
 Our function seems to oscillate between a nearly fully decoded message
-where b is mapped to p and the opposite.
+where b is mapped to p and the opposite (when it's allowed to run
+without a break)
 
 As a result we obtain the following decoded message (either decoding by
 hand the last few wrong letters in the cipher):
@@ -301,6 +316,10 @@ split with the european union as the reason it authorized a vaccine
 first in fact britain remains under the blocs regulatory umbrella and
 was able to move more quickly because of an old law enabling it to make
 its own determinations in public health emergencies}''
+
+The message is fully decrypted after a variable number of iterations,
+sometimes it takes 3,000 iters but other tiems it might take 60,000
+iters.
 
 \newpage
 
@@ -501,7 +520,7 @@ regardless because we thought it was very pretty).
 Proving using the 1000 simulation data that our exercise 2b is correct:
 
 \begin{verbatim}
-#> [1] 0.203
+#> [1] 0.164
 \end{verbatim}
 
 We can see that our result approaches 0.2 very closely, which is the
@@ -799,7 +818,7 @@ Using the previous function to calculate the overtaking probability of
 our simulation:
 
 \begin{verbatim}
-#> [1] 0.4528
+#> [1] 0.444
 \end{verbatim}
 
 We obtain an overtaking probability of \(\approx 0.44\).
@@ -845,9 +864,9 @@ all the averages.
 6 - We obtain the long-run average amount of customers in the system
 
 \begin{verbatim}
-#>  [1]  3.616915  9.726368  2.412935 11.537313  3.497512  2.965174  5.592040
-#>  [8]  4.835821 33.965174  1.437811
-#> [1] 7.958706
+#>  [1] 5.014925 1.417910 2.666667 4.149254 3.333333 4.144279 5.283582 8.567164
+#>  [9] 2.825871 4.731343
+#> [1] 4.213433
 \end{verbatim}
 
 Note: Given that this is a random process, different runs of the
@@ -881,10 +900,10 @@ Calculation by hand:
 \addcontentsline{toc}{section}{References}
 
 \hypertarget{refs}{}
+\leavevmode\hypertarget{ref-wiki1}{}%
+, English Wikipedia. n.d. ``M/M/c Queue.''
+
 \leavevmode\hypertarget{ref-qm1}{}%
 Ganesh, Ayalvadi, Ph.D. 2012. ``Simple Queueing Models.''
-
-\leavevmode\hypertarget{ref-wiki1}{}%
-n.d. ``M/M/c Queue.''
 
 \end{document}

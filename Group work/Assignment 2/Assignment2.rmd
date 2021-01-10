@@ -31,7 +31,7 @@ library(reticulate)
 
 This is our implementation of the decoding algorithm, it is implemented using python. Every single step is explained during the code with its corresponding block or line(s) of code.
 
-```{python, eval=FALSE}
+```{python}
 # importing libraries
 import numpy as np
 from copy import deepcopy
@@ -56,17 +56,23 @@ with open('./data/messages.txt') as f:
     message = f.readlines()[0].replace('\n','')
 
 # decode function
-def decode(message, freqs, iters):
+def decode(message, freqs, iters, check_words=True):
     """
     Function to decode a message enconded 
     using a substitution cipher utilizing the
     Metropolis-Hastings algorithm.
 
     Params:
-    message = string to decode
-    freqs = frequency table for transitions of letters
-            to input
-    iters = amount of iterations to perform
+    message =     string to decode
+    freqs =       frequency table for transitions of letters
+                  to input
+    iters =       amount of iterations to perform
+    check_words = if true the loop will be broken if 5 words
+                  in the message are found to be in the english
+                  language corpus, if false then the function will
+                  print the message after the condition where
+                  min(a(f*,f), 1) > random uniformly distributed number between
+                  0 and 1
     """
     # dictionary to organize the iterations
     # the score and the result of the attempt
@@ -168,12 +174,20 @@ def decode(message, freqs, iters):
             # we test 5 random words to see if they are actually words 
             # present in the word corpus
             conds = [np.random.choice(msg_list) in words.words() for x in range(5)]
-            # we break the loop if the 5 true words are found
-            if False not in conds:
-                print('Cipher used:\n')
-                print(f'{cd}')
-                print(f'\nfound at iteration: {i}\nMessage (may contain wrong letters):')
-                return msg_iters[i]
+            # if check words == True
+            if check_words == True:
+                # we break the loop if the 5 true words are found
+                if False not in conds:
+                    print('Cipher used:\n')
+                    print(f'{cd}')
+                    print(f'\nfound at iteration: {i}\nMessage (may contain wrong letters):')
+                    return msg_iters[i]
+            # otherwise
+            else:
+                # we print the iteration number and message only 
+                # when the cipher changes
+                print(f'iteration #{i}:\n')
+                print(f'{msg_iters[i][1]}\n')
         # if condition is false
         else:
             # resetting the letters after a failed score comparison
@@ -193,11 +207,13 @@ def decode(message, freqs, iters):
     return pd.DataFrame(df)
 ```
 
-Our function seems to oscillate between a nearly fully decoded message where b is mapped to p and the opposite.
+Our function seems to oscillate between a nearly fully decoded message where b is mapped to p and the opposite (when it's allowed to run without a break)
 
 As a result we obtain the following decoded message (either decoding by hand the last few wrong letters in the cipher):
 
 "*a day after britain became the first western country to authorize a coronavirus vaccine british and american officials bickered over which governments drug approval process was better leading scientists to warn that the debate could undermine public faith vaccine nationalism has no place in covid or other public health matters of global significance said a scientific adviser to the british government science has always been the exit strategy from this horrendous pandemic several top british lawmakers have also incorrectly cast the countrys split with the european union as the reason it authorized a vaccine first in fact britain remains under the blocs regulatory umbrella and was able to move more quickly because of an old law enabling it to make its own determinations in public health emergencies*"
+
+The message is fully decrypted after a variable number of iterations, sometimes it takes 3,000 iters but other tiems it might take 60,000 iters.
 
 \newpage
 

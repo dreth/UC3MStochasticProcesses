@@ -22,7 +22,7 @@ with open('./data/messages.txt') as f:
     message = f.readlines()[0].replace('\n','')
 
 # decode function
-def decode(message, freqs, iters):
+def decode(message, freqs, iters, check_words=True):
     """
     Function to decode a message enconded 
     using a substitution cipher utilizing the
@@ -134,11 +134,20 @@ def decode(message, freqs, iters):
             # we test 5 random words to see if they are actually words 
             # present in the word corpus
             conds = [np.random.choice(msg_list) in words.words() for x in range(5)]
-            # we break the loop if the 5 true words are found
-            if False not in conds:
-                print(f'found at iteration: {i}')
-                print(msg_iters[i])
-                break
+            # if check words == True
+            if check_words == True:
+                # we break the loop if the 5 true words are found
+                if False not in conds:
+                    print('Cipher used:\n')
+                    print(f'{cd}')
+                    print(f'\nfound at iteration: {i}\nMessage (may contain wrong letters):')
+                    return msg_iters[i]
+            # otherwise
+            else:
+                # we print the iteration number and message only 
+                # when the cipher changes
+                print(f'iteration #{i}:\n')
+                print(f'{msg_iters[i][1]}\n')
         # if condition is false
         else:
             # resetting the letters after a failed score comparison
@@ -154,7 +163,7 @@ def decode(message, freqs, iters):
     df = {'iter':[it for it in msg_iters.keys()],
           'score':[msg[0] for msg in msg_iters.values()],
           'msg':[msg[1] for msg in msg_iters.values()]}
-    # return the dataframe
+    # return the dataframe in case the loop was never broken
     return pd.DataFrame(df)
 
-result = decode(message,freq, 50000)
+decode(message, freq, 100000, check_words=False)
