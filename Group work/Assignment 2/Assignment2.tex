@@ -306,8 +306,8 @@ Importing libraries
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{print}\NormalTok{(result[result[}\StringTok{'score'}\NormalTok{] }\OperatorTok{==} \BuiltInTok{max}\NormalTok{(result[}\StringTok{'score'}\NormalTok{])])}
-\CommentTok{#>       iter     score                                                msg}
-\CommentTok{#> 6811  6908  1.300691  h dht hogez uzfghfx uekhne gre ofzlg aelgezx k...}
+\CommentTok{#>         iter     score                                                msg}
+\CommentTok{#> 30938  31353  1.319558  v svt vwfoc hcqfvqp hozvdo flo wqcbf mobfocp z...}
 \end{Highlighting}
 \end{Shaded}
 
@@ -472,7 +472,7 @@ homogenous poisson process:
 \NormalTok{    \}}
 \NormalTok{\}}
 \NormalTok{ratio}\OperatorTok{/}\DecValTok{1000}
-\CommentTok{#> [1] 0.206}
+\CommentTok{#> [1] 0.192}
 \end{Highlighting}
 \end{Shaded}
 
@@ -689,23 +689,6 @@ We define the following function to simulate the queueing system:
 
 \includegraphics{./figures/unnamed-chunk-12-1.pdf}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{last_arrival_time <-}\StringTok{ }\NormalTok{times}\OperatorTok{$}\NormalTok{arrival[}\KeywordTok{length}\NormalTok{(times}\OperatorTok{$}\NormalTok{arrival)]}
-\KeywordTok{sum}\NormalTok{(times}\OperatorTok{$}\NormalTok{exit }\OperatorTok{>}\StringTok{ }\NormalTok{last_arrival_time)}
-\CommentTok{#> [1] 6}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{nb.pe=}\KeywordTok{numeric}\NormalTok{(}\DataTypeTok{length=}\KeywordTok{length}\NormalTok{(t))}
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(times}\OperatorTok{$}\NormalTok{service))\{}
-\NormalTok{  nb.pe[i]=}\KeywordTok{length}\NormalTok{(}\KeywordTok{which}\NormalTok{(times}\OperatorTok{$}\NormalTok{arrival}\OperatorTok{<}\NormalTok{times}\OperatorTok{$}\NormalTok{service[i]}\OperatorTok{&}\NormalTok{times}\OperatorTok{$}\NormalTok{exit}\OperatorTok{>}\NormalTok{times}\OperatorTok{$}\NormalTok{service[i]))}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
 \hypertarget{e}{%
 \section{(e)}\label{e}}
 
@@ -737,5 +720,58 @@ probability:
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
+
+Write theRcode necessary to simulate the system (provide the code) and
+generate thetimes customers leave the supermarket
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{avgs <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# general average of multiple simulations}
+\NormalTok{number_of_customers <-}\StringTok{ }\DecValTok{8500} \CommentTok{# simulations done with 8500 people}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{    times <-}\StringTok{ }\KeywordTok{q}\NormalTok{(number_of_customers, }\DataTypeTok{l=}\FloatTok{0.4}\NormalTok{, }\DataTypeTok{m=}\FloatTok{0.25}\NormalTok{) }\CommentTok{# running the simulation}
+\NormalTok{    avg <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# estimation (usually includes an extra person)}
+\NormalTok{    avg_p <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# pessimistic estimation (usually excludes that extra person)}
+    \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{0}\OperatorTok{:}\DecValTok{99}\NormalTok{) \{}
+        \CommentTok{# assuming the person number number_of_customers - i is the last one}
+\NormalTok{        last_arrival_time <-}\StringTok{ }\NormalTok{times}\OperatorTok{$}\NormalTok{arrival[}\KeywordTok{length}\NormalTok{(times}\OperatorTok{$}\NormalTok{arrival)}\OperatorTok{-}\NormalTok{i] }
+        \CommentTok{# checking all exit times mayores al arrival time of the person number number_of_customers - i}
+\NormalTok{        val <-}\StringTok{ }\KeywordTok{sum}\NormalTok{(times}\OperatorTok{$}\NormalTok{exit[}\DecValTok{1}\OperatorTok{:}\NormalTok{(}\KeywordTok{length}\NormalTok{(times}\OperatorTok{$}\NormalTok{arrival)}\OperatorTok{-}\NormalTok{i}\DecValTok{-1}\NormalTok{)] }\OperatorTok{>}\StringTok{ }\NormalTok{last_arrival_time) }
+\NormalTok{        avg <-}\StringTok{ }\KeywordTok{c}\NormalTok{(avg,val)}
+\NormalTok{        avg_p <-}\StringTok{ }\KeywordTok{c}\NormalTok{(avg,val}\DecValTok{-1}\NormalTok{)}
+\NormalTok{    \}}
+    \CommentTok{# joining all estimations }
+\NormalTok{    total_avg <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{c}\NormalTok{(avg,avg_p))}
+    \CommentTok{# adding to vector with  all averages}
+\NormalTok{    avgs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(avgs, total_avg) }
+\NormalTok{\}}
+\CommentTok{# printing averages}
+\NormalTok{avgs}
+\CommentTok{#>  [1]  2.278607  4.228856  2.636816 11.771144  2.064677  3.621891  2.696517}
+\CommentTok{#>  [8]  5.905473  2.179104 10.149254}
+\CommentTok{# calculating the average of averages}
+\KeywordTok{mean}\NormalTok{(avgs) }
+\CommentTok{#> [1] 4.753234}
+\end{Highlighting}
+\end{Shaded}
+
+Calculation by hand:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lambda <-}\StringTok{ }\FloatTok{0.4}
+\NormalTok{mu <-}\StringTok{ }\FloatTok{0.25}
+\NormalTok{lambda2mu <-}\StringTok{ }\NormalTok{lambda}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{mu)}
+
+\NormalTok{pi_}\DecValTok{0}\NormalTok{ <-}\StringTok{ }\DecValTok{1}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{lambda2mu)) }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)}
+\NormalTok{L <-}\StringTok{ }\NormalTok{pi_}\DecValTok{0} \OperatorTok{*}\StringTok{ }\NormalTok{(}\DecValTok{1} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{(lambda2mu}\OperatorTok{/}\NormalTok{((}\DecValTok{1}\OperatorTok{-}\NormalTok{lambda2mu)}\OperatorTok{^}\DecValTok{2}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\(\frac{\lambda}{2 \mu} = \frac{0.4}{2(0.25)} = 0.8\)
+
+\(\pi_0 = \frac{1}{2(\frac{1}{1-0.8}) - 1} = \frac{1}{9} = \approx 0. \bar{1}\)
+
+\(L = \pi_0 (1 + 2 \frac{0.8}{(1-0.8)^2}) = 4. \bar{5}\)
 
 \end{document}

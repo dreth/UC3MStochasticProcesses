@@ -16,7 +16,7 @@ reticulate::use_python('/home/dreth/anaconda3/bin/python')
 
 Importing libraries
 
-```{r, echo=FALSE, warning=FALSE, results='hide'}
+```{r, echo=FALSE, warning=FALSE, results='hide', message=FALSE}
 library(markovchain)
 library(matlib)
 library(nleqslv)
@@ -267,6 +267,7 @@ decode <- function(message, freqs, iters) {
 decode(message,freq,100)
 ```
 
+\newpage
 
 # Problem 2
 
@@ -336,6 +337,8 @@ t = 0.91232
 
 Por lo que $t = 0.91232$ horas (aproximadamente a las 8:54 de la mañana).
 
+\newpage
+
 # (c)
 
 The following function simulates a non-homogenous poisson process from a homogenous poisson process:
@@ -377,6 +380,8 @@ non_hom_poisson <- function(fun,l,a,b,start=0) {
 ```
 
 \newpage
+
+The following code iterates over *iters* amount of times the previously defined non-homogenous poisson process with the given function defining $\lambda$ dependent on a parameter $t$ ($\lambda (t)$).
 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 simulation <- function(iters, functions, lambdas, ints) {
@@ -436,11 +441,15 @@ lambda_funs <- list(l1, l2, l3, l4)
 
 \newpage
 
+Running 1000 iterations of the simulation (we included the R output regardless because we thought it was very pretty).
+
 ```{r, echo=TRUE, warning=FALSE, message=FALSE, fig.height=16, fig.width=14}
 data <- simulation(1000, lambda_funs, lambdas, ints)
 ```
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+Proving using the 1000 simulation data that our exercise 2b is correct:
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 ratio <- 0
 for (i in 1:length(data)) {
     df <- data.frame(data[[i]])
@@ -451,6 +460,8 @@ for (i in 1:length(data)) {
 }
 ratio/1000
 ```
+
+We can see that our result approaches 0.2 very closely, which is the remaining probability ($1-0.8 = 0.2$).
 
 # Problem 3
 
@@ -681,37 +692,33 @@ d <- function(customers, queue, ExitTimes) {
   return(ot_prob)
 }
 ```
-
+Write theRcode necessary to simulate the system (provide the code) and generate thetimes customers leave the supermarket
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
-avgs <- c()
-number_of_customers <- 8500
-for (i in 1:10){
-    times <- q(number_of_customers, l=0.4, m=0.25) 
-    avg <- c()
-    for (i in 0:9) {
-        last_arrival_time <- times$arrival[length(times$arrival)-i]
-        avg <- c(avg,sum(times$exit[1:(length(times$arrival)-i-1)] > last_arrival_time) - 1)
+avgs <- c() # general average of multiple simulations
+number_of_customers <- 8500 # simulations done with 8500 people
+for (i in 1:10) {
+    times <- q(number_of_customers, l=0.4, m=0.25) # running the simulation
+    avg <- c() # estimation (usually includes an extra person)
+    avg_p <- c() # pessimistic estimation (usually excludes that extra person)
+    for (i in 0:99) {
+        # assuming the person number number_of_customers - i is the last one
+        last_arrival_time <- times$arrival[length(times$arrival)-i] 
+        # checking all exit times mayores al arrival time of the person number number_of_customers - i
+        val <- sum(times$exit[1:(length(times$arrival)-i-1)] > last_arrival_time) 
+        avg <- c(avg,val)
+        avg_p <- c(avg,val-1)
     }
-    avgs <- c(avgs, avg)
+    # joining all estimations 
+    total_avg <- mean(c(avg,avg_p))
+    # adding to vector with  all averages
+    avgs <- c(avgs, total_avg) 
 }
+# printing averages
 avgs
-mean(avgs)
+# calculating the average of averages
+mean(avgs) 
 ```
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
-avgs <- c()
-number_of_customers <- 8500
-for (i in 1:100){
-    times <- q(number_of_customers, l=0.4, m=0.25) 
-    nb.pe=numeric(length=length(t))
-    for (i in 1:length(times$service)){
-        nb.pe[i]=length(which(times$arrival<times$exit[i]))
-    }
-    avgs <- c(avgs, mean(nb.pe))
-}
-avgs
-mean(avgs)
-```
 
 Calculation by hand:
 
@@ -726,4 +733,6 @@ L <- pi_0 * (1 + 2*(lambda2mu/((1-lambda2mu)^2)))
 
 $\frac{\lambda}{2 \mu} = \frac{0.4}{2(0.25)} = 0.8$
 
-$\pi_0 = \frac{1}{}
+$\pi_0 = \frac{1}{2(\frac{1}{1-0.8}) - 1} = \frac{1}{9} = \approx 0. \bar{1}$
+
+$L = \pi_0 (1 + 2 \frac{0.8}{(1-0.8)^2}) = 4. \bar{5}$
