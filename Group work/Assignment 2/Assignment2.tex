@@ -520,7 +520,7 @@ regardless because we thought it was very pretty).
 Proving using the 1000 simulation data that our exercise 2b is correct:
 
 \begin{verbatim}
-#> [1] 0.206
+#> [1] 0.204
 \end{verbatim}
 
 We can see that our result approaches 0.2 very closely, which is the
@@ -828,7 +828,7 @@ Using the previous function to calculate the overtaking probability of
 our simulation:
 
 \begin{verbatim}
-#> [1] 0.4513333
+#> [1] 0.4541333
 \end{verbatim}
 
 We obtain an overtaking probability of \(\approx 0.44\).
@@ -889,7 +889,7 @@ all the averages.
 \begin{Highlighting}[]
 \NormalTok{avgs <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# general average of multiple simulations}
 \NormalTok{number_of_customers <-}\StringTok{ }\DecValTok{8500} \CommentTok{# simulations done with 8500 people}
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{20}\NormalTok{) \{}
 \NormalTok{    times <-}\StringTok{ }\KeywordTok{q}\NormalTok{(number_of_customers, }\DataTypeTok{l=}\FloatTok{0.4}\NormalTok{, }\DataTypeTok{m=}\FloatTok{0.25}\NormalTok{) }\CommentTok{# running the simulation}
 \NormalTok{    avg <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# estimation (usually includes an extra person)}
 \NormalTok{    avg_p <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# pessimistic estimation (usually excludes that extra person)}
@@ -909,7 +909,7 @@ all the averages.
 \NormalTok{\}}
 \CommentTok{# calculating the average of averages}
 \KeywordTok{mean}\NormalTok{(avgs) }
-\CommentTok{#> [1] 5.28408}
+\CommentTok{#> [1] 4.952488}
 \end{Highlighting}
 \end{Shaded}
 

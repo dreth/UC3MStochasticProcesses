@@ -733,7 +733,7 @@ Our methodology is the following:
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 avgs <- c() # general average of multiple simulations
 number_of_customers <- 8500 # simulations done with 8500 people
-for (i in 1:10) {
+for (i in 1:20) {
     times <- q(number_of_customers, l=0.4, m=0.25) # running the simulation
     avg <- c() # estimation (usually includes an extra person)
     avg_p <- c() # pessimistic estimation (usually excludes that extra person)
