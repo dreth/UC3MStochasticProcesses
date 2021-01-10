@@ -520,7 +520,7 @@ regardless because we thought it was very pretty).
 Proving using the 1000 simulation data that our exercise 2b is correct:
 
 \begin{verbatim}
-#> [1] 0.194
+#> [1] 0.206
 \end{verbatim}
 
 We can see that our result approaches 0.2 very closely, which is the
@@ -828,7 +828,7 @@ Using the previous function to calculate the overtaking probability of
 our simulation:
 
 \begin{verbatim}
-#> [1] 0.4442667
+#> [1] 0.4513333
 \end{verbatim}
 
 We obtain an overtaking probability of \(\approx 0.44\).
@@ -855,16 +855,28 @@ exercises with 8500 customers
 
 3 - Within the loop we iteratively create vectors in order to add (to
 them) the number of customers in the system by assuming that the
-customer being iterated by is the last one - if we have 8500 customers,
-we take the last 100 customers and we assume that the 8400 is the last
-one, then we assume the 8401 is the last one and so on.
+customer being iterated by is the last one
+
+\begin{itemize}
+\tightlist
+\item
+  if we have 8500 customers, we take the last 100 customers and we
+  assume that the 8400 is the last one, then we assume the 8401 is the
+  last one and so on.
+\end{itemize}
 
 4 - We continue doing this until we have a vector of 100 counts of
-customers in the system. - While in the loop, we will create a vector
-with the exact count and the count minus one, so we have 2 vectors of
-counts, one with a pessimistic count (excluding the current customer
-that just came in) and one with an optimistic count (including the
-customer that just came in)
+customers in the system.
+
+\begin{itemize}
+\tightlist
+\item
+  While in the loop, we will create a vector with the exact count and
+  the count minus one, so we have 2 vectors of counts, one with a
+  pessimistic count (excluding the current customer that just came in)
+  and one with an optimistic count (including the customer that just
+  came in)
+\end{itemize}
 
 5 - We keep doing this until we have about 10 vectors (as we do 10
 simulations) of 100 averaged vectors (optimistic and pessimistic counts
@@ -873,11 +885,33 @@ all the averages.
 
 6 - We obtain the long-run average amount of customers in the system
 
-\begin{verbatim}
-#>  [1] 2.074627 4.845771 5.024876 4.686567 3.268657 1.925373 2.393035 4.154229
-#>  [9] 4.000000 2.238806
-#> [1] 3.461194
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{avgs <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# general average of multiple simulations}
+\NormalTok{number_of_customers <-}\StringTok{ }\DecValTok{8500} \CommentTok{# simulations done with 8500 people}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{    times <-}\StringTok{ }\KeywordTok{q}\NormalTok{(number_of_customers, }\DataTypeTok{l=}\FloatTok{0.4}\NormalTok{, }\DataTypeTok{m=}\FloatTok{0.25}\NormalTok{) }\CommentTok{# running the simulation}
+\NormalTok{    avg <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# estimation (usually includes an extra person)}
+\NormalTok{    avg_p <-}\StringTok{ }\KeywordTok{c}\NormalTok{() }\CommentTok{# pessimistic estimation (usually excludes that extra person)}
+    \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{0}\OperatorTok{:}\DecValTok{99}\NormalTok{) \{}
+        \CommentTok{# assuming the person number number_of_customers - i is the last one}
+\NormalTok{        last_arrival_time <-}\StringTok{ }\NormalTok{times}\OperatorTok{$}\NormalTok{arrival[}\KeywordTok{length}\NormalTok{(times}\OperatorTok{$}\NormalTok{arrival)}\OperatorTok{-}\NormalTok{i] }
+        \CommentTok{# checking all exit times mayores al arrival time }
+        \CommentTok{# of the person number number_of_customers - i}
+\NormalTok{        val <-}\StringTok{ }\KeywordTok{sum}\NormalTok{(times}\OperatorTok{$}\NormalTok{exit[}\DecValTok{1}\OperatorTok{:}\NormalTok{(}\KeywordTok{length}\NormalTok{(times}\OperatorTok{$}\NormalTok{arrival)}\OperatorTok{-}\NormalTok{i}\DecValTok{-1}\NormalTok{)] }\OperatorTok{>}\StringTok{ }\NormalTok{last_arrival_time) }
+\NormalTok{        avg <-}\StringTok{ }\KeywordTok{c}\NormalTok{(avg,val)}
+\NormalTok{        avg_p <-}\StringTok{ }\KeywordTok{c}\NormalTok{(avg,val}\DecValTok{-1}\NormalTok{)}
+\NormalTok{    \}}
+    \CommentTok{# joining all estimations}
+\NormalTok{    total_avg <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{c}\NormalTok{(avg,avg_p))}
+    \CommentTok{# adding to vector with  all averages}
+\NormalTok{    avgs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(avgs, total_avg) }
+\NormalTok{\}}
+\CommentTok{# calculating the average of averages}
+\KeywordTok{mean}\NormalTok{(avgs) }
+\CommentTok{#> [1] 5.28408}
+\end{Highlighting}
+\end{Shaded}
 
 Note: Given that this is a random process, different runs of the
 function we defined to do such simulation can yield different results.
@@ -885,6 +919,8 @@ However, we found our results to be between 3 and 6.
 
 Despite this, our most consistent results are around \textbf{4.4} and
 \textbf{4.5}.
+
+\newpage
 
 Calculation by hand:
 

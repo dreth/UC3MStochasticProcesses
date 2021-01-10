@@ -719,16 +719,18 @@ Our methodology is the following:
 2 - We create an empty averages vector
 
 3 - Within the loop we iteratively create vectors in order to add (to them) the number of customers in the system by assuming that the customer being iterated by is the last one
- - if we have 8500 customers, we take the last 100 customers and we assume that the 8400 is the last one, then we assume the 8401 is the last one and so on.
+
+- if we have 8500 customers, we take the last 100 customers and we assume that the 8400 is the last one, then we assume the 8401 is the last one and so on.
 
 4 - We continue doing this until we have a vector of 100 counts of customers in the system.
-    - While in the loop, we will create a vector with the exact count and the count minus one, so we have 2 vectors of counts, one with a pessimistic count (excluding the current customer that just came in) and one with an optimistic count (including the customer that just came in)
+
+- While in the loop, we will create a vector with the exact count and the count minus one, so we have 2 vectors of counts, one with a pessimistic count (excluding the current customer that just came in) and one with an optimistic count (including the customer that just came in)
 
 5 - We keep doing this until we have about 10 vectors (as we do 10 simulations) of 100 averaged vectors (optimistic and pessimistic counts of customers averaged per simulation) and we calculate the average of all the averages.
 
 6 - We obtain the long-run average amount of customers in the system
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
 avgs <- c() # general average of multiple simulations
 number_of_customers <- 8500 # simulations done with 8500 people
 for (i in 1:10) {
@@ -749,8 +751,6 @@ for (i in 1:10) {
     # adding to vector with  all averages
     avgs <- c(avgs, total_avg) 
 }
-# printing averages
-avgs
 # calculating the average of averages
 mean(avgs) 
 ```
@@ -758,6 +758,8 @@ mean(avgs)
 Note: Given that this is a random process, different runs of the function we defined to do such simulation can yield different results. However, we found our results to be between 3 and 6.
 
 Despite this, our most consistent results are around **4.4** and **4.5**.
+
+\newpage
 
 Calculation by hand:
 
