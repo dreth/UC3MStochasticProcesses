@@ -3,8 +3,8 @@
 Teammates:
 
 - [Danyu Zhang](https://github.com/danyuz)
-- Javier Esteban Aragoneses
-- Mauricio Marcos Fajgenbaun
+- [Javier Esteban Aragoneses](https://github.com/JavierEA1)
+- [Mauricio Marcos Fajgenbaun](https://github.com/MauMau93)
 
 While the documents have been uploaded up on my github, I will link my classmate's github profiles as they create them.
 
